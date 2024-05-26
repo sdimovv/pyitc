@@ -12,17 +12,24 @@ project('pyitc', 'c',
     ]
 )
 
+libitc_c_args = [
+    '-DITC_CONFIG_ENABLE_EXTENDED_API=1',
+    '-DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
+]
+
 pyitc_pyext_name = '_@0@'.format(meson.project_name())
 
 c_compiler = meson.get_compiler('c')
 python = import('python').find_installation(pure: false)
 ffi_generator_script = files('ffi_generator.py')
 
+add_global_arguments(libitc_c_args, language: 'c')
+
 libitc_proj = subproject(
     'libitc',
     required: true,
     default_options: {
-        'default_library': 'static'
+        'default_library': 'static',
     },
 )
 libitc_dep = libitc_proj.get_variable('libitc_dep')
@@ -35,6 +42,7 @@ pyitc_pp = configure_file(
     command: [
         c_compiler,
         '-I@0@'.format(libitc_inc_dir),
+        libitc_c_args,
         '-E',
         libitc_header,
     ],
@@ -58,7 +66,6 @@ pyitc_src = configure_file(
 python.extension_module(
     pyitc_pyext_name,
     pyitc_src,
-    pyitc_pp,
     dependencies: [
         libitc_dep,
     ],
