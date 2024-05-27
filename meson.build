@@ -50,15 +50,31 @@ pyitc_pp = configure_file(
     capture: true,
 )
 
+# Generate the pyext preprocessor definitions (from the underlying C lib header)
+# Used to turn the `ITC_*` preprocessor definitions into global consts in the
+# python module
+pyitc_defs_pp = configure_file(
+    command: [
+        c_compiler,
+        '-I@0@'.format(libitc_inc_dir),
+        libitc_c_args,
+        '-dM',
+        '-E',
+        libitc_header,
+    ],
+    output: '@0@_definitions.h'.format(pyitc_pyext_name),
+    capture: true,
+)
+
 # Generate the pyext implementation using CFFI
 pyitc_src = configure_file(
     command: [
         python,
         ffi_generator_script,
         '@INPUT@',
-        pyitc_pyext_name
+        pyitc_pyext_name,
     ],
-    input: pyitc_pp,
+    input: [pyitc_pp, pyitc_defs_pp],
     output: '@0@.c'.format(pyitc_pyext_name)
 )
 
