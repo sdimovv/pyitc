@@ -25,6 +25,8 @@ class Id(ItcWrapper):
     def clone(self) -> "Id":
         """Clone the ID
 
+        :returns: The cloned ID
+        :rtype: Id
         :raises ItcError: If something goes wrong during the cloning
         """
         cloned_c_type = _wrappers.clone_id(self._c_type)
@@ -33,8 +35,12 @@ class Id(ItcWrapper):
         return id
 
     def split(self) -> "Id":
-        """Split the ID
+        """Split the ID into two distinct (non-overlapping) intervals
 
+        After splitting this ID becomes the first half of the interval.
+
+        :returns: The second half of the split ID
+        :rtype: Id
         :raises ItcError: If something goes wrong during the split
         """
         other_c_type = _wrappers.split_id(self._c_type)
@@ -42,21 +48,24 @@ class Id(ItcWrapper):
         id._c_type = other_c_type
         return id
 
-    def sum(self, id: "Id") -> None:
-        """Sum the ID
+    def sum(self, other_id: "Id") -> None:
+        """Sum the ID interval
 
-        :param id: The ID to be summed with
-        :type id: Id
+        After the sumation, this ID becomes the owner of the summed interval,
+        while `other_id` becomes invalid and cannot be used anymore.
+
+        :param other_id: The ID to be summed with
+        :type other_id: Id
         :raises TypeError: If :param:`id` is not of type :class:`Id`
         :raises ValueError: If :param:`id` the IDs are of the same instance
         :raises ItcError: If something goes wrong during the sumation
         """
-        if not isinstance(id, Id):
-            raise TypeError(f"Expected instance of Id(), got id={type(id)}")
-        if self._c_type == id._c_type:
+        if not isinstance(other_id, Id):
+            raise TypeError(f"Expected instance of Id(), got id={type(other_id)}")
+        if self._c_type == other_id._c_type:
             raise ValueError("An ID cannot be summed with itself")
 
-        _wrappers.sum_id(self._c_type, id._c_type)
+        _wrappers.sum_id(self._c_type, other_id._c_type)
 
     def _new_c_type(self) -> CTypesData:
         """Create a new ITC ID. Only used during initialisation"""

@@ -121,7 +121,7 @@ def free_id(pp_handle) -> None:
 def clone_id(pp_handle: CTypesData) -> CTypesData:
     """Clone (copy) an ITC ID
 
-    The ID must be deallocated with :meth:`free_id` when no longer needed.
+    The cloned ID must be deallocated with :meth:`free_id` when no longer needed.
 
     :param pp_handle: The handle of the source ID
     :type pp_handle: CTypesData
@@ -136,7 +136,7 @@ def clone_id(pp_handle: CTypesData) -> CTypesData:
 def split_id(pp_handle: CTypesData) -> CTypesData:
     """Split an ITC ID into two non-overlapping (distinct) intervals
 
-    The IDs must be deallocated with :meth:`free_id` when no longer needed.
+    Both IDs must be deallocated with :meth:`free_id` when no longer needed.
 
     :param pp_handle: The handle of the source ID.
         This handle will be modified in place and become the first half of the
@@ -160,9 +160,9 @@ def split_id(pp_handle: CTypesData) -> CTypesData:
     return pp_other_handle
 
 def sum_id(pp_handle: CTypesData, pp_other_handle: CTypesData) -> None:
-    """Sum two ITC IDs into one
+    """Sum two ITC ID intervals
 
-    The ID must be deallocated with :meth:`free_id` when no longer needed.
+    The summed ID must be deallocated with :meth:`free_id` when no longer needed.
 
     :param pp_handle: The handle of the first source ID
         This handle will be modified in place and become the summed ID
