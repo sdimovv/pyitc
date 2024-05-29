@@ -71,6 +71,15 @@ class InactiveIdError(ItcError):
             "used in a destructive operation (such as summing)"
         )
 
+class InactiveEventError(ItcError):
+    """The Event is inactive"""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "This Event is inactive. This is likely because it was previously "
+            "used in a destructive operation (such as joining)"
+        )
+
 class ItcCApiError(ItcError):
     """The base for all C API ITC exceptions"""
 

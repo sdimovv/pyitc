@@ -4,7 +4,7 @@ from cffi.backend_ctypes import CTypesData
 from pyitc._internals._wrappers import ItcWrapper
 
 from ._internals import _wrappers
-from .exceptions import InactiveIdError
+from .exceptions import InactiveEventError, InactiveIdError
 
 
 class Id(ItcWrapper):
@@ -30,7 +30,7 @@ class Id(ItcWrapper):
         :raises ItcError: If something goes wrong during the cloning
         """
         cloned_c_type = _wrappers.clone_id(self._c_type)
-        id = Id(seed=False)
+        id = Id()
         id._c_type = cloned_c_type
         return id
 
@@ -44,7 +44,7 @@ class Id(ItcWrapper):
         :raises ItcError: If something goes wrong during the split
         """
         other_c_type = _wrappers.split_id(self._c_type)
-        id = Id(seed=False)
+        id = Id()
         id._c_type = other_c_type
         return id
 
@@ -56,8 +56,8 @@ class Id(ItcWrapper):
 
         :param other_id: The ID to be summed with
         :type other_id: Id
-        :raises TypeError: If :param:`id` is not of type :class:`Id`
-        :raises ValueError: If :param:`id` the IDs are of the same instance
+        :raises TypeError: If :param:`other_id` is not of type :class:`Id`
+        :raises ValueError: If both IDs are of the same instance
         :raises ItcError: If something goes wrong during the sumation
         """
         if not isinstance(other_id, Id):
@@ -85,4 +85,44 @@ class Id(ItcWrapper):
         """Get the underlying CFFI cdata object"""
         if not _wrappers.is_handle_valid(super()._c_type):
             raise InactiveIdError()
+        return super()._c_type
+
+class Event(ItcWrapper):
+    """The Interval Tree Clock's Event"""
+
+    def is_valid(self) -> bool:
+        """Validate the Event"""
+        try:
+            return _wrappers.is_event_valid(self._c_type)
+        except InactiveEventError:
+            return False
+
+    def clone(self) -> "Event":
+        """Clone the Event
+
+        :returns: The cloned Event
+        :rtype: Event
+        :raises ItcError: If something goes wrong during the cloning
+        """
+        cloned_c_type = _wrappers.clone_event(self._c_type)
+        event = Event()
+        event._c_type = cloned_c_type
+        return event
+
+    def _new_c_type(self) -> CTypesData:
+        """Create a new ITC Event. Only used during initialisation"""
+        return _wrappers.new_event()
+
+    def _del_c_type(self, c_type) -> None:
+        """Delete the underlying CFFI cdata object"""
+        try:
+            _wrappers.free_event(self._c_type)
+        except InactiveEventError:
+            pass
+
+    @ItcWrapper._c_type.getter
+    def _c_type(self) -> CTypesData:
+        """Get the underlying CFFI cdata object"""
+        if not _wrappers.is_handle_valid(super()._c_type):
+            raise InactiveEventError()
         return super()._c_type

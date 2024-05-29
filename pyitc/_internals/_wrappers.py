@@ -75,6 +75,13 @@ def _new_id_pp_handle() -> CTypesData:
     """
     return _ffi.new("ITC_Id_t **")
 
+def _new_event_pp_handle() -> CTypesData:
+    """Allocate a new ITC Event handle
+
+    This handle will be automatically freed when no longer referenced.
+    """
+    return _ffi.new("ITC_Event_t **")
+
 
 def is_handle_valid(pp_handle) -> bool:
     """Validate an ID/Event/Stamp handle
@@ -186,5 +193,60 @@ def is_id_valid(pp_handle: CTypesData) -> bool:
 
     if is_handle_valid(pp_handle):
         is_valid = _lib.ITC_Id_validate(pp_handle[0]) == ItcStatus.SUCCESS
+
+    return is_valid
+
+def new_event() -> CTypesData:
+    """Allocate a new ITC Event
+
+    The Event must be deallocated with :meth:`free_event` when no longer needed.
+
+    :returns: The ITC Event handle
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = _new_event_pp_handle()
+    _handle_c_return_status(_lib.ITC_Event_new(pp_handle))
+    return pp_handle
+
+def free_event(pp_handle) -> None:
+    """Free an ITC Event
+
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    try:
+        _handle_c_return_status(_lib.ITC_Event_destroy(pp_handle))
+    finally:
+        # Sanitise the pointers
+        pp_handle[0] = _ffi.NULL
+        pp_handle = _ffi.NULL
+
+def clone_event(pp_handle: CTypesData) -> CTypesData:
+    """Clone (copy) an ITC Event
+
+    The cloned Event must be deallocated with :meth:`free_event` when no longer needed.
+
+    :param pp_handle: The handle of the source Event
+    :type pp_handle: CTypesData
+    :returns: The handle of the cloned ITC Event
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_cloned_ptr = _new_event_pp_handle()
+    _handle_c_return_status(_lib.ITC_Event_clone(pp_handle[0], pp_cloned_ptr))
+    return pp_cloned_ptr
+
+def is_event_valid(pp_handle: CTypesData) -> bool:
+    """Check whether the given ITC Event is valid
+
+    :param pp_handle: The handle of the Event to validate
+    :type pp_handle: CTypesData
+    :returns: True if the Event is valid, False otherwise
+    :rtype: bool
+    """
+    is_valid = False
+
+    if is_handle_valid(pp_handle):
+        is_valid = _lib.ITC_Event_validate(pp_handle[0]) == ItcStatus.SUCCESS
 
     return is_valid
