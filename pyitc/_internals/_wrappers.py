@@ -38,7 +38,6 @@ class ItcWrapper(ABC):
     def __del__(self) -> None:
         """Deallocate the object"""
         del self._c_type
-        super().__del__()
 
     @property
     def _c_type(self) -> CTypesData:
