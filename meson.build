@@ -92,7 +92,7 @@ python.extension_module(
 python.install_sources(
     files([
         'pyitc' / '__init__.py',
-        'pyitc' / 'id.py',
+        'pyitc' / 'extended_api.py',
         'pyitc' / 'exceptions.py',
     ]),
     subdir: meson.project_name(),
