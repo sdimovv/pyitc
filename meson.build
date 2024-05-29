@@ -88,3 +88,21 @@ python.extension_module(
     subdir: meson.project_name(),
     install: true,
 )
+
+python.install_sources(
+    files([
+        'pyitc' / '__init__.py',
+        'pyitc' / 'id.py',
+        'pyitc' / 'exceptions.py',
+    ]),
+    subdir: meson.project_name(),
+)
+
+
+python.install_sources(
+    files([
+        'pyitc' / '_internals' / '__init__.py',
+        'pyitc' / '_internals' / '_wrappers.py',
+    ]),
+    subdir: meson.project_name() / '_internals',
+)
