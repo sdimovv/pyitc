@@ -1,9 +1,60 @@
+from abc import ABC, abstractmethod
 from typing import Union
 
 from cffi.backend_ctypes import CTypesData
 
 from ..exceptions import ItcCApiError, ItcStatus, UnkownError
 from . import _ffi, _lib
+
+
+class ItcWrapper(ABC):
+    """The base class of an ITC ID, Event or Stamp"""
+
+    @abstractmethod
+    def clone(self) -> "ItcWrapper":
+        """Deep clone object"""
+        pass
+
+    @abstractmethod
+    def is_valid(self) -> bool:
+        """Check the object is in a valid state"""
+        pass
+
+    @abstractmethod
+    def _new_c_type(self) -> CTypesData:
+        """Allocate a new ITC/Event/Stamp"""
+        pass
+
+    @abstractmethod
+    def _del_c_type(self, c_type) -> None:
+        """Free the ITC/Event/Stamp stored in `self._c_type`"""
+        pass
+
+    def __init__(self) -> None:
+        """Initialise a new ITC ID/Event/Stamp"""
+        super().__init__()
+        self.__internal_c_type: CTypesData = self._new_c_type()
+
+    def __del__(self) -> None:
+        """Deallocate the object"""
+        del self._c_type
+        super().__del__()
+
+    @property
+    def _c_type(self) -> CTypesData:
+        """Get the underlying CFFI cdata object"""
+        return self.__internal_c_type
+
+    @_c_type.deleter
+    def _c_type(self) -> None:
+        """Delete the underlying CFFI cdata object"""
+        self._del_c_type(self.__internal_c_type)
+
+    @_c_type.setter
+    def _c_type(self, c_type) -> None:
+        """Set the underlying CFFI cdata object"""
+        del self._c_type
+        self.__internal_c_type = c_type
 
 
 def _handle_c_return_status(status: Union[int, ItcStatus]) -> None:
