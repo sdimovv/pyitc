@@ -29,7 +29,7 @@ class ItcStatus(int, Enum):
                                "Operation failed due to the ITC Event counter underflowing")
     UNSUPPORTED_EVENT_COUNTER_SIZE = (_lib.ITC_STATUS_EVENT_UNSUPPORTED_COUNTER_SIZE,
                                       "Operation failed due to the serialised ITC Event counter being too big")
-    INCOMPATIBLE_LIB_VERSION = (_lib.ITC_STATUS_EVENT_UNSUPPORTED_COUNTER_SIZE,
+    INCOMPATIBLE_LIB_VERSION = (_lib.ITC_STATUS_SERDES_INCOMPATIBLE_LIB_VERSION,
                                 "Operation failed due to the serialised ITC data being from an older or newer libitc version")
 
     UNKNOWN = (-1, "Unknown status")
@@ -96,7 +96,8 @@ class UnkownError(ItcCApiError):
     """Unknown ITC error"""
 
     def __init__(self, status: Union[int, ItcStatus, None] = None) -> None:
-        super().__init__(ItcStatus(status or self.STATUS))
+        self.STATUS = ItcStatus(status or self.STATUS)
+        super().__init__()
 
 class FailureError(ItcCApiError):
     """Operation failed with unknown error"""
