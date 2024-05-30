@@ -21,6 +21,17 @@ class ItcWrapper(ABC):
         pass
 
     @abstractmethod
+    def serialise(self) -> bytes:
+        """Serialise the ID/Event/Stamp"""
+        pass
+
+    @classmethod
+    @abstractmethod
+    def deserialise(cls, buffer: Union[bytes, bytearray]) -> "ItcWrapper":
+        """Deserialise an ID/Event/Stamp"""
+        pass
+
+    @abstractmethod
     def _new_c_type(self) -> CTypesData:
         """Allocate a new ITC/Event/Stamp"""
         pass
@@ -181,6 +192,50 @@ def sum_id(pp_handle: CTypesData, pp_other_handle: CTypesData) -> None:
     """
     _handle_c_return_status(_lib.ITC_Id_sum(pp_handle, pp_other_handle))
 
+
+def serialise_id(pp_handle: CTypesData) -> bytes:
+    """Serialise the given ITC ID
+
+    :returns: The buffer with the serialised ID
+    :rtype: bytes
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    array_size = 64
+    array: bytearray
+    p_c_buffer_size = _ffi.new("uint32_t *")
+
+    status = ItcStatus.INSUFFICIENT_RESOURCES
+    while status == ItcStatus.INSUFFICIENT_RESOURCES:
+        array = bytearray(array_size)
+        c_buffer = _ffi.from_buffer("uint8_t[]", array, require_writable=True)
+        p_c_buffer_size[0] = len(c_buffer)
+        status = _lib.ITC_SerDes_serialiseId(pp_handle[0], c_buffer, p_c_buffer_size)
+        # If the call fails with insufficient resources, try again with a
+        # bigger buffer
+        array_size *= 2
+
+    _handle_c_return_status(status)
+
+    return bytes(array[:p_c_buffer_size[0]])
+
+def deserialise_id(buffer: Union[bytes, bytearray]) -> CTypesData:
+    """Deserialise an ITC ID
+
+    The deserialised ID must be deallocated with :meth:`free_id` when no longer needed.
+
+    :param buffer: The buffer containing the serialised ID
+    :type buffer: Union[bytes, bytearray]
+    :returns: The handle to the deserialised ID
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = _new_id_pp_handle()
+    c_buffer = _ffi.from_buffer("uint8_t[]", buffer, require_writable=False)
+    c_buffer_size = len(c_buffer)
+    _handle_c_return_status(
+        _lib.ITC_SerDes_deserialiseId(c_buffer, c_buffer_size, pp_handle))
+    return pp_handle
+
 def is_id_valid(pp_handle: CTypesData) -> bool:
     """Check whether the given ITC ID is valid
 
@@ -235,6 +290,49 @@ def clone_event(pp_handle: CTypesData) -> CTypesData:
     pp_cloned_ptr = _new_event_pp_handle()
     _handle_c_return_status(_lib.ITC_Event_clone(pp_handle[0], pp_cloned_ptr))
     return pp_cloned_ptr
+
+def serialise_event(pp_handle: CTypesData) -> bytes:
+    """Serialise the given ITC Event
+
+    :returns: The buffer with the serialised Event
+    :rtype: bytes
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    array_size = 64
+    array: bytearray
+    p_c_buffer_size = _ffi.new("uint32_t *")
+
+    status = ItcStatus.INSUFFICIENT_RESOURCES
+    while status == ItcStatus.INSUFFICIENT_RESOURCES:
+        array = bytearray(array_size)
+        c_buffer = _ffi.from_buffer("uint8_t[]", array, require_writable=True)
+        p_c_buffer_size[0] = len(c_buffer)
+        status = _lib.ITC_SerDes_serialiseEvent(pp_handle[0], c_buffer, p_c_buffer_size)
+        # If the call fails with insufficient resources, try again with a
+        # bigger buffer
+        array_size *= 2
+
+    _handle_c_return_status(status)
+
+    return bytes(array[:p_c_buffer_size[0]])
+
+def deserialise_event(buffer: Union[bytes, bytearray]) -> CTypesData:
+    """Deerialise an ITC Event
+
+    The deserialised ID must be deallocated with :meth:`free_id` when no longer needed.
+
+    :param buffer: The buffer containing the serialised Event
+    :type buffer: Union[bytes, bytearray]
+    :returns: The handle to the deserialised Event
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = _new_event_pp_handle()
+    c_buffer = _ffi.from_buffer("uint8_t[]", buffer, require_writable=False)
+    c_buffer_size = len(c_buffer)
+    _handle_c_return_status(
+        _lib.ITC_SerDes_deserialiseEvent(c_buffer, c_buffer_size, pp_handle))
+    return pp_handle
 
 def is_event_valid(pp_handle: CTypesData) -> bool:
     """Check whether the given ITC Event is valid

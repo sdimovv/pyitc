@@ -1,13 +1,13 @@
 
-from cffi.backend_ctypes import CTypesData
+from typing import Union
 
-from pyitc._internals._wrappers import ItcWrapper
+from cffi.backend_ctypes import CTypesData
 
 from ._internals import _wrappers
 from .exceptions import InactiveEventError, InactiveIdError
 
 
-class Id(ItcWrapper):
+class Id(_wrappers.ItcWrapper):
     """The Interval Tree Clock's ID"""
 
     def __init__(self, seed: bool = True) -> None:
@@ -32,6 +32,34 @@ class Id(ItcWrapper):
         cloned_c_type = _wrappers.clone_id(self._c_type)
         id = Id()
         id._c_type = cloned_c_type
+        return id
+
+    def serialise(self) -> bytes:
+        """Serialise the ID
+
+        :returns: A buffer with the serialised ID in it.
+        :rtype: bytes
+        :raises ItcError: If something goes wrong during the serialisation
+        """
+        return _wrappers.serialise_id(self._c_type)
+
+    @classmethod
+    def deserialise(cls, buffer: Union[bytes, bytearray]) -> "Id":
+        """Deserialise an ID
+
+        :param buffer: The buffer containing the serialised ID
+        :type buffer: Union[bytes, bytearray]
+        :returns: The deserialised ID
+        :rtype: Id
+        :raises ItcError: If something goes wrong during the deserialisation
+        """
+        if not isinstance(buffer, (bytes, bytearray)):
+            raise TypeError(
+                "Expected instance of Union[bytes, bytearray], "
+                f"got buffer={type(buffer)}")
+
+        id = Id()
+        id._c_type = _wrappers.deserialise_id(bytes(buffer))
         return id
 
     def split(self) -> "Id":
@@ -80,14 +108,14 @@ class Id(ItcWrapper):
         except InactiveIdError:
             pass
 
-    @ItcWrapper._c_type.getter
+    @_wrappers.ItcWrapper._c_type.getter
     def _c_type(self) -> CTypesData:
         """Get the underlying CFFI cdata object"""
         if not _wrappers.is_handle_valid(super()._c_type):
             raise InactiveIdError()
         return super()._c_type
 
-class Event(ItcWrapper):
+class Event(_wrappers.ItcWrapper):
     """The Interval Tree Clock's Event"""
 
     def is_valid(self) -> bool:
@@ -109,6 +137,34 @@ class Event(ItcWrapper):
         event._c_type = cloned_c_type
         return event
 
+    def serialise(self) -> bytes:
+        """Serialise the Event
+
+        :returns: A buffer with the serialised Event in it.
+        :rtype: bytes
+        :raises ItcError: If something goes wrong during the serialisation
+        """
+        return _wrappers.serialise_event(self._c_type)
+
+    @classmethod
+    def deserialise(cls, buffer: Union[bytes, bytearray]) -> "Event":
+        """Deserialise an Event
+
+        :param buffer: The buffer containing the serialised Event
+        :type buffer: Union[bytes, bytearray]
+        :returns: The deserialised Event
+        :rtype: Event
+        :raises ItcError: If something goes wrong during the deserialisation
+        """
+        if not isinstance(buffer, (bytes, bytearray)):
+            raise TypeError(
+                "Expected instance of Union[bytes, bytearray], "
+                f"got buffer={type(buffer)}")
+
+        event = Event()
+        event._c_type = _wrappers.deserialise_event(bytes(buffer))
+        return event
+
     def _new_c_type(self) -> CTypesData:
         """Create a new ITC Event. Only used during initialisation"""
         return _wrappers.new_event()
@@ -120,7 +176,7 @@ class Event(ItcWrapper):
         except InactiveEventError:
             pass
 
-    @ItcWrapper._c_type.getter
+    @_wrappers.ItcWrapper._c_type.getter
     def _c_type(self) -> CTypesData:
         """Get the underlying CFFI cdata object"""
         if not _wrappers.is_handle_valid(super()._c_type):
