@@ -24,10 +24,7 @@ class Stamp(_wrappers.ItcWrapper):
         :rtype: Stamp
         :raises ItcError: If something goes wrong during the cloning
         """
-        cloned_c_type = _wrappers.clone_stamp(self._c_type)
-        stamp = Stamp()
-        stamp._c_type = cloned_c_type
-        return stamp
+        return Stamp(_c_type=_wrappers.clone_stamp(self._c_type))
 
     def serialise(self) -> bytes:
         """Serialise the Stamp
@@ -53,23 +50,19 @@ class Stamp(_wrappers.ItcWrapper):
                 "Expected instance of Union[bytes, bytearray], "
                 f"got buffer={type(buffer)}")
 
-        stamp = Stamp()
-        stamp._c_type = _wrappers.deserialise_stamp(bytes(buffer))
-        return stamp
+        return Stamp(_c_type=_wrappers.deserialise_stamp(bytes(buffer)))
 
     @property
-    def id_component(self) -> extended_api.Event:
+    def id_component(self) -> extended_api.Id:
         """Get a copy of the ID component"""
-        id = extended_api.Id()
-        id._c_type = _wrappers.copy_id_component_of_stamp(self._c_type)
-        return id
+        return extended_api.Id(
+            _c_type=_wrappers.copy_id_component_of_stamp(self._c_type))
 
     @property
     def event_component(self) -> extended_api.Event:
         """Get a copy of the Event component"""
-        event = extended_api.Event()
-        event._c_type = _wrappers.copy_event_component_of_stamp(self._c_type)
-        return event
+        return extended_api.Event(
+            _c_type=_wrappers.copy_event_component_of_stamp(self._c_type))
 
     def peek(self) -> "Stamp":
         """Create a peek Stamp (Stamp with NULL ID) from the current Stamp
@@ -78,10 +71,7 @@ class Stamp(_wrappers.ItcWrapper):
         :rtype: Stamp
         :raises ItcError: If something goes wrong during the peeking
         """
-        other_c_type = _wrappers.new_peek_stamp(self._c_type)
-        stamp = Stamp()
-        stamp._c_type = other_c_type
-        return stamp
+        return Stamp(_c_type=_wrappers.new_peek_stamp(self._c_type))
 
     def fork(self) -> "Stamp":
         """Fork (split) the Stamp into two distinct (non-overlapping) intervals
@@ -93,10 +83,7 @@ class Stamp(_wrappers.ItcWrapper):
         :rtype: Stamp
         :raises ItcError: If something goes wrong during the forking
         """
-        other_c_type = _wrappers.fork_stamp(self._c_type)
-        stamp = Stamp()
-        stamp._c_type = other_c_type
-        return stamp
+        return Stamp(_c_type=_wrappers.fork_stamp(self._c_type))
 
     def event(self) -> None:
         """Add an event to the Stamp (inflate it)

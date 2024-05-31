@@ -1,5 +1,5 @@
 
-from typing import Union
+from typing import Any, Union
 
 from cffi.backend_ctypes import CTypesData as _CTypesData
 
@@ -10,10 +10,11 @@ from .exceptions import InactiveEventError, InactiveIdError
 class Id(_wrappers.ItcWrapper):
     """The Interval Tree Clock's ID"""
 
-    def __init__(self, seed: bool = True) -> None:
+    def __init__(self, seed: bool = True, **kwargs: Any) -> None:
         """Create a new ID"""
         self._seed = seed
-        super().__init__()
+        super().__init__(**kwargs)
+        del self._seed
 
     def is_valid(self) -> bool:
         """Validate the ID"""
@@ -29,10 +30,7 @@ class Id(_wrappers.ItcWrapper):
         :rtype: Id
         :raises ItcError: If something goes wrong during the cloning
         """
-        cloned_c_type = _wrappers.clone_id(self._c_type)
-        id = Id()
-        id._c_type = cloned_c_type
-        return id
+        return Id(_c_type=_wrappers.clone_id(self._c_type))
 
     def serialise(self) -> bytes:
         """Serialise the ID
@@ -58,9 +56,7 @@ class Id(_wrappers.ItcWrapper):
                 "Expected instance of Union[bytes, bytearray], "
                 f"got buffer={type(buffer)}")
 
-        id = Id()
-        id._c_type = _wrappers.deserialise_id(bytes(buffer))
-        return id
+        return Id(_c_type=_wrappers.deserialise_id(bytes(buffer)))
 
     def split(self) -> "Id":
         """Split the ID into two distinct (non-overlapping) intervals
@@ -71,10 +67,7 @@ class Id(_wrappers.ItcWrapper):
         :rtype: Id
         :raises ItcError: If something goes wrong during the split
         """
-        other_c_type = _wrappers.split_id(self._c_type)
-        id = Id()
-        id._c_type = other_c_type
-        return id
+        return Id(_c_type=_wrappers.split_id(self._c_type))
 
     def sum(self, *other_id: "Id") -> None:
         """Sum ID interval(s)
@@ -92,16 +85,14 @@ class Id(_wrappers.ItcWrapper):
             if not isinstance(id, Id):
                 raise TypeError(f"Expected instance of Id, got id={type(id)}")
             if self._c_type == id._c_type:
-                raise ValueError("An Id cannot be joined with itself")
+                raise ValueError("An Id cannot be summed with itself")
 
         for id in other_id:
             _wrappers.sum_id(self._c_type, id._c_type)
 
     def _new_c_type(self) -> _CTypesData:
         """Create a new ITC ID. Only used during initialisation"""
-        c_type = _wrappers.new_id(self._seed)
-        del self._seed
-        return c_type
+        return _wrappers.new_id(self._seed)
 
     def _del_c_type(self, c_type) -> None:
         """Delete the underlying CFFI cdata object"""
@@ -131,10 +122,7 @@ class Event(_wrappers.ItcWrapper):
         :rtype: Event
         :raises ItcError: If something goes wrong during the cloning
         """
-        cloned_c_type = _wrappers.clone_event(self._c_type)
-        event = Event()
-        event._c_type = cloned_c_type
-        return event
+        return Event(_c_type=_wrappers.clone_event(self._c_type))
 
     def serialise(self) -> bytes:
         """Serialise the Event
@@ -160,9 +148,7 @@ class Event(_wrappers.ItcWrapper):
                 "Expected instance of Union[bytes, bytearray], "
                 f"got buffer={type(buffer)}")
 
-        event = Event()
-        event._c_type = _wrappers.deserialise_event(bytes(buffer))
-        return event
+        return Event(_c_type=_wrappers.deserialise_event(bytes(buffer)))
 
     def _new_c_type(self) -> _CTypesData:
         """Create a new ITC Event. Only used during initialisation"""

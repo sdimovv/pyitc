@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import IntEnum
-from typing import Union
+from typing import Optional, Union
 
 from cffi.backend_ctypes import CTypesData
 
@@ -49,10 +49,13 @@ class ItcWrapper(ABC):
         """Free the ITC/Event/Stamp stored in `self._c_type`"""
         pass
 
-    def __init__(self) -> None:
+    def __init__(self, _c_type: Optional[CTypesData] = None) -> None:
         """Initialise a new ITC ID/Event/Stamp"""
         super().__init__()
-        self.__internal_c_type: CTypesData = self._new_c_type()
+        if _c_type:
+            self.__internal_c_type = _c_type
+        else:
+            self.__internal_c_type: CTypesData = self._new_c_type()
 
     def __del__(self) -> None:
         """Deallocate the object"""
