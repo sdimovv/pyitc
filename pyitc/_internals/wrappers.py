@@ -109,7 +109,6 @@ def _new_stamp_pp_handle() -> CTypesData:
     """
     return _ffi.new("ITC_Stamp_t **")
 
-
 def is_handle_valid(pp_handle) -> bool:
     """Validate an ID/Event/Stamp handle
 
@@ -215,23 +214,22 @@ def serialise_id(pp_handle: CTypesData) -> bytes:
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    array_size = 64
-    array: bytearray
-    p_c_buffer_size = _ffi.new("uint32_t *")
+    c_array_size = 64
+    c_array: CTypesData
+    p_c_array_size = _ffi.new("uint32_t *")
 
     status = ItcStatus.INSUFFICIENT_RESOURCES
     while status == ItcStatus.INSUFFICIENT_RESOURCES:
-        array = bytearray(array_size)
-        c_buffer = _ffi.from_buffer("uint8_t[]", array, require_writable=True)
-        p_c_buffer_size[0] = len(c_buffer)
-        status = _lib.ITC_SerDes_serialiseId(pp_handle[0], c_buffer, p_c_buffer_size)
+        c_array = _ffi.new("uint8_t[]", c_array_size)
+        p_c_array_size[0] = len(c_array)
+        status = _lib.ITC_SerDes_serialiseId(pp_handle[0], c_array, p_c_array_size)
         # If the call fails with insufficient resources, try again with a
         # bigger buffer
-        array_size *= 2
+        c_array_size *= 2
 
     _handle_c_return_status(status)
 
-    return bytes(array[:p_c_buffer_size[0]])
+    return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
 
 def deserialise_id(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deserialise an ITC ID
@@ -313,23 +311,22 @@ def serialise_event(pp_handle: CTypesData) -> bytes:
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    array_size = 64
-    array: bytearray
-    p_c_buffer_size = _ffi.new("uint32_t *")
+    c_array_size = 64
+    c_array: CTypesData
+    p_c_array_size = _ffi.new("uint32_t *")
 
     status = ItcStatus.INSUFFICIENT_RESOURCES
     while status == ItcStatus.INSUFFICIENT_RESOURCES:
-        array = bytearray(array_size)
-        c_buffer = _ffi.from_buffer("uint8_t[]", array, require_writable=True)
-        p_c_buffer_size[0] = len(c_buffer)
-        status = _lib.ITC_SerDes_serialiseEvent(pp_handle[0], c_buffer, p_c_buffer_size)
+        c_array = _ffi.new("uint8_t[]", c_array_size)
+        p_c_array_size[0] = len(c_array)
+        status = _lib.ITC_SerDes_serialiseEvent(pp_handle[0], c_array, p_c_array_size)
         # If the call fails with insufficient resources, try again with a
         # bigger buffer
-        array_size *= 2
+        c_array_size *= 2
 
     _handle_c_return_status(status)
 
-    return bytes(array[:p_c_buffer_size[0]])
+    return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
 
 def deserialise_event(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deerialise an ITC Event
@@ -502,23 +499,22 @@ def serialise_stamp(pp_handle: CTypesData) -> bytes:
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    array_size = 64
-    array: bytearray
-    p_c_buffer_size = _ffi.new("uint32_t *")
+    c_array_size = 64
+    c_array: CTypesData
+    p_c_array_size = _ffi.new("uint32_t *")
 
     status = ItcStatus.INSUFFICIENT_RESOURCES
     while status == ItcStatus.INSUFFICIENT_RESOURCES:
-        array = bytearray(array_size)
-        c_buffer = _ffi.from_buffer("uint8_t[]", array, require_writable=True)
-        p_c_buffer_size[0] = len(c_buffer)
-        status = _lib.ITC_SerDes_serialiseStamp(pp_handle[0], c_buffer, p_c_buffer_size)
+        c_array = _ffi.new("uint8_t[]", c_array_size)
+        p_c_array_size[0] = len(c_array)
+        status = _lib.ITC_SerDes_serialiseStamp(pp_handle[0], c_array, p_c_array_size)
         # If the call fails with insufficient resources, try again with a
         # bigger buffer
-        array_size *= 2
+        c_array_size *= 2
 
     _handle_c_return_status(status)
 
-    return bytes(array[:p_c_buffer_size[0]])
+    return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
 
 def deserialise_stamp(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deserialise an ITC Stamp
