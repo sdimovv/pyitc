@@ -76,10 +76,10 @@ class Id(_wrappers.ItcWrapper):
         id._c_type = other_c_type
         return id
 
-    def sum(self, other_id: "Id") -> None:
-        """Sum the ID interval
+    def sum(self, *other_id: "Id") -> None:
+        """Sum ID interval(s)
 
-        After the sumation, this ID becomes the owner of the summed interval,
+        After the sumation, this ID becomes the owner of the summed interval(s),
         while `other_id` becomes invalid and cannot be used anymore.
 
         :param other_id: The ID to be summed with
@@ -88,12 +88,14 @@ class Id(_wrappers.ItcWrapper):
         :raises ValueError: If both IDs are of the same instance
         :raises ItcError: If something goes wrong during the sumation
         """
-        if not isinstance(other_id, Id):
-            raise TypeError(f"Expected instance of Id(), got id={type(other_id)}")
-        if self._c_type == other_id._c_type:
-            raise ValueError("An ID cannot be summed with itself")
+        for id in other_id:
+            if not isinstance(id, Id):
+                raise TypeError(f"Expected instance of Id, got id={type(id)}")
+            if self._c_type == id._c_type:
+                raise ValueError("An Id cannot be joined with itself")
 
-        _wrappers.sum_id(self._c_type, other_id._c_type)
+        for id in other_id:
+            _wrappers.sum_id(self._c_type, id._c_type)
 
     def _new_c_type(self) -> CTypesData:
         """Create a new ITC ID. Only used during initialisation"""
@@ -103,10 +105,7 @@ class Id(_wrappers.ItcWrapper):
 
     def _del_c_type(self, c_type) -> None:
         """Delete the underlying CFFI cdata object"""
-        try:
-            _wrappers.free_id(self._c_type)
-        except InactiveIdError:
-            pass
+        _wrappers.free_id(c_type)
 
     @_wrappers.ItcWrapper._c_type.getter
     def _c_type(self) -> CTypesData:
@@ -171,10 +170,7 @@ class Event(_wrappers.ItcWrapper):
 
     def _del_c_type(self, c_type) -> None:
         """Delete the underlying CFFI cdata object"""
-        try:
-            _wrappers.free_event(self._c_type)
-        except InactiveEventError:
-            pass
+        _wrappers.free_event(c_type)
 
     @_wrappers.ItcWrapper._c_type.getter
     def _c_type(self) -> CTypesData:

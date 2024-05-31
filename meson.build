@@ -93,6 +93,7 @@ python.install_sources(
     files([
         'pyitc' / '__init__.py',
         'pyitc' / 'extended_api.py',
+        'pyitc' / 'pyitc.py',
         'pyitc' / 'exceptions.py',
     ]),
     subdir: meson.project_name(),

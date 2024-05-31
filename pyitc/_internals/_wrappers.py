@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from enum import IntEnum
 from typing import Union
 
 from cffi.backend_ctypes import CTypesData
@@ -6,6 +7,13 @@ from cffi.backend_ctypes import CTypesData
 from ..exceptions import ItcCApiError, ItcStatus, UnkownError
 from . import _ffi, _lib
 
+
+class StampComparisonResult(IntEnum):
+    """The ITC Stamp comparison result returned from the C API"""
+    LESS_THAN = _lib.ITC_STAMP_COMPARISON_LESS_THAN
+    GREATER_THAN = _lib.ITC_STAMP_COMPARISON_GREATER_THAN
+    EQUAL = _lib.ITC_STAMP_COMPARISON_EQUAL
+    CONCURRENT = _lib.ITC_STAMP_COMPARISON_CONCURRENT
 
 class ItcWrapper(ABC):
     """The base class of an ITC ID, Event or Stamp"""
@@ -58,7 +66,8 @@ class ItcWrapper(ABC):
     @_c_type.deleter
     def _c_type(self) -> None:
         """Delete the underlying CFFI cdata object"""
-        self._del_c_type(self.__internal_c_type)
+        if is_handle_valid(self.__internal_c_type):
+            self._del_c_type(self.__internal_c_type)
 
     @_c_type.setter
     def _c_type(self, c_type) -> None:
@@ -93,6 +102,13 @@ def _new_event_pp_handle() -> CTypesData:
     """
     return _ffi.new("ITC_Event_t **")
 
+def _new_stamp_pp_handle() -> CTypesData:
+    """Allocate a new ITC Stamp handle
+
+    This handle will be automatically freed when no longer referenced.
+    """
+    return _ffi.new("ITC_Stamp_t **")
+
 
 def is_handle_valid(pp_handle) -> bool:
     """Validate an ID/Event/Stamp handle
@@ -104,7 +120,7 @@ def is_handle_valid(pp_handle) -> bool:
     """
     return pp_handle and pp_handle != _ffi.NULL and pp_handle[0] != _ffi.NULL
 
-def new_id(seed: bool = False) -> CTypesData:
+def new_id(seed: bool) -> CTypesData:
     """Allocate a new ITC ID
 
     The ID must be deallocated with :meth:`free_id` when no longer needed.
@@ -147,9 +163,9 @@ def clone_id(pp_handle: CTypesData) -> CTypesData:
     :rtype: CTypesData
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    pp_cloned_ptr = _new_id_pp_handle()
-    _handle_c_return_status(_lib.ITC_Id_clone(pp_handle[0], pp_cloned_ptr))
-    return pp_cloned_ptr
+    pp_cloned_handle = _new_id_pp_handle()
+    _handle_c_return_status(_lib.ITC_Id_clone(pp_handle[0], pp_cloned_handle))
+    return pp_cloned_handle
 
 def split_id(pp_handle: CTypesData) -> CTypesData:
     """Split an ITC ID into two non-overlapping (distinct) intervals
@@ -191,7 +207,6 @@ def sum_id(pp_handle: CTypesData, pp_other_handle: CTypesData) -> None:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     _handle_c_return_status(_lib.ITC_Id_sum(pp_handle, pp_other_handle))
-
 
 def serialise_id(pp_handle: CTypesData) -> bytes:
     """Serialise the given ITC ID
@@ -287,9 +302,9 @@ def clone_event(pp_handle: CTypesData) -> CTypesData:
     :rtype: CTypesData
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    pp_cloned_ptr = _new_event_pp_handle()
-    _handle_c_return_status(_lib.ITC_Event_clone(pp_handle[0], pp_cloned_ptr))
-    return pp_cloned_ptr
+    pp_cloned_handle = _new_event_pp_handle()
+    _handle_c_return_status(_lib.ITC_Event_clone(pp_handle[0], pp_cloned_handle))
+    return pp_cloned_handle
 
 def serialise_event(pp_handle: CTypesData) -> bytes:
     """Serialise the given ITC Event
@@ -348,3 +363,228 @@ def is_event_valid(pp_handle: CTypesData) -> bool:
         is_valid = _lib.ITC_Event_validate(pp_handle[0]) == ItcStatus.SUCCESS
 
     return is_valid
+
+def new_stamp() -> CTypesData:
+    """Allocate a new ITC seed Stamp
+
+    The Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
+
+    :returns: The ITC seed Stamp handle
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = _new_stamp_pp_handle()
+    _handle_c_return_status(_lib.ITC_Stamp_newSeed(pp_handle))
+    return pp_handle
+
+def new_peek_stamp(pp_src_handle: CTypesData) -> CTypesData:
+    """Allocate a new ITC peek Stamp from a regular Stamp
+
+    The Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
+
+    :param pp_src_handle: The handle of the source Stamp, which Event component will
+        be cloned. The source Stamp will remain unmodified.
+    :type pp_src_handle: CTypesData
+    :returns: The ITC peek Stamp handle
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = _new_stamp_pp_handle()
+    _handle_c_return_status(_lib.ITC_Stamp_newPeek(pp_src_handle[0], pp_handle))
+    return pp_handle
+
+def free_stamp(pp_handle) -> None:
+    """Free an ITC Stamp
+
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    try:
+        _handle_c_return_status(_lib.ITC_Stamp_destroy(pp_handle))
+    finally:
+        # Sanitise the pointers
+        pp_handle[0] = _ffi.NULL
+        pp_handle = _ffi.NULL
+
+def clone_stamp(pp_handle: CTypesData) -> CTypesData:
+    """Clone (copy) an ITC Stamp
+
+    The cloned Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
+
+    :param pp_handle: The handle of the source Stamp
+    :type pp_handle: CTypesData
+    :returns: The handle of the cloned ITC Stamp
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_cloned_handle = _new_stamp_pp_handle()
+    _handle_c_return_status(_lib.ITC_Stamp_clone(pp_handle[0], pp_cloned_handle))
+    return pp_cloned_handle
+
+def fork_stamp(pp_handle: CTypesData) -> CTypesData:
+    """Fork (split) an ITC Stamp into two non-overlapping (distinct) intervals
+
+    Both Stamps must be deallocated with :meth:`free_stamp` when no longer needed.
+
+    :param pp_handle: The handle of the source Stamp.
+        This handle will be modified in place and become the first half of the
+        forked Stamp
+    :type pp_handle: CTypesData
+    :returns: The handle of the other half of the forked ITC Stamp
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_other_handle = _new_stamp_pp_handle()
+
+    try:
+        _handle_c_return_status(_lib.ITC_Stamp_fork(pp_handle, pp_other_handle))
+    except Exception:
+        # The other handle cannot be returned. Destroy it
+        if is_handle_valid(pp_other_handle):
+            free_stamp(pp_other_handle)
+
+        raise
+
+    return pp_other_handle
+
+def inflate_stamp(pp_handle: CTypesData) -> None:
+    """Add an Event (inflate) the given ITC Stamp
+
+    :param pp_handle: The handle of the source Stamp. The Stamp will be modified
+        in place.
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    _handle_c_return_status(_lib.ITC_Stamp_event(pp_handle[0]))
+
+def join_stamp(pp_handle: CTypesData, pp_other_handle: CTypesData) -> None:
+    """Join two ITC Stamp, merging their ID intervals and causal history
+
+    The joined Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
+
+    :param pp_handle: The handle of the first source Stamp
+        This handle will be modified in place and become the joined Stamp
+    :type pp_handle: CTypesData
+    :param pp_other_handle: The handle of the second source Stamp.
+        This handle will be deallocated
+    :type pp_other_handle: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    _handle_c_return_status(_lib.ITC_Stamp_join(pp_handle, pp_other_handle))
+
+def compare_stamps(pp_handle: CTypesData, pp_other_handle: CTypesData) -> StampComparisonResult:
+    """Compare two Stamps
+
+    :param pp_handle: The handle of the first source Stamp
+    :type pp_handle: CTypesData
+    :param pp_other_handle: The handle of the second source Stamp.
+    :type pp_other_handle: CTypesData
+    :returns: The result of the comparsion `pp_handle <> pp_other_handle`.
+        I.e if `pp_handle < pp_other_handle`, then `StampComparisonResult.LESS_THAN`
+        is returned.
+    :rtype: StampComparisonResult
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    p_comparison_result = _ffi.new("ITC_Stamp_Comparison_t *")
+
+    _handle_c_return_status(
+        _lib.ITC_Stamp_compare(
+            pp_handle[0],
+            pp_other_handle[0],
+            p_comparison_result
+        )
+    )
+
+    return StampComparisonResult(p_comparison_result[0])
+
+def serialise_stamp(pp_handle: CTypesData) -> bytes:
+    """Serialise the given ITC Stamp
+
+    :returns: The buffer with the serialised Stamp
+    :rtype: bytes
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    array_size = 64
+    array: bytearray
+    p_c_buffer_size = _ffi.new("uint32_t *")
+
+    status = ItcStatus.INSUFFICIENT_RESOURCES
+    while status == ItcStatus.INSUFFICIENT_RESOURCES:
+        array = bytearray(array_size)
+        c_buffer = _ffi.from_buffer("uint8_t[]", array, require_writable=True)
+        p_c_buffer_size[0] = len(c_buffer)
+        status = _lib.ITC_SerDes_serialiseStamp(pp_handle[0], c_buffer, p_c_buffer_size)
+        # If the call fails with insufficient resources, try again with a
+        # bigger buffer
+        array_size *= 2
+
+    _handle_c_return_status(status)
+
+    return bytes(array[:p_c_buffer_size[0]])
+
+def deserialise_stamp(buffer: Union[bytes, bytearray]) -> CTypesData:
+    """Deserialise an ITC Stamp
+
+    The deserialised Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
+
+    :param buffer: The buffer containing the serialised Stamp
+    :type buffer: Union[bytes, bytearray]
+    :returns: The handle to the deserialised Stamp
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = _new_stamp_pp_handle()
+    c_buffer = _ffi.from_buffer("uint8_t[]", buffer, require_writable=False)
+    c_buffer_size = len(c_buffer)
+    _handle_c_return_status(
+        _lib.ITC_SerDes_deserialiseStamp(c_buffer, c_buffer_size, pp_handle))
+    return pp_handle
+
+def is_stamp_valid(pp_handle: CTypesData) -> bool:
+    """Check whether the given ITC Stamp is valid
+
+    :param pp_handle: The handle of the Stamp to validate
+    :type pp_handle: CTypesData
+    :returns: True if the Stamp is valid, False otherwise
+    :rtype: bool
+    """
+    is_valid = False
+
+    if is_handle_valid(pp_handle):
+        is_valid = _lib.ITC_Stamp_validate(pp_handle[0]) == ItcStatus.SUCCESS
+
+    return is_valid
+
+def copy_id_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
+    """Get a copy of the ID component of a Stamp
+
+    :param pp_handle: The handle of the source Stamp.
+    :returns: The handle of the ID
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_id_handle = _new_id_pp_handle()
+    _handle_c_return_status(_lib.ITC_Stamp_getId(pp_handle[0], pp_id_handle))
+    return pp_id_handle
+
+def copy_event_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
+    """Get a copy of the Event component of a Stamp
+
+    :param pp_handle: The handle of the source Stamp.
+    :returns: The handle of the Event
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_event_handle = _new_event_pp_handle()
+    _handle_c_return_status(_lib.ITC_Stamp_getEvent(pp_handle[0], pp_event_handle))
+    return pp_event_handle
+
+# def set_id_in_stamp(p_stamp_handle: CTypesData, p_id_handle: CTypesData) -> CTypesData:
+#     """Set the ID component of a Stamp
+
+#     :param pp_handle: The handle of the source Stamp.
+#     :returns: The handle of the ID
+#     :rtype: CTypesData
+#     :raises ItcCApiError: If something goes wrong while inside the C API
+#     """
+#     pp_id_handle = _new_id_pp_handle()
+#     _handle_c_return_status(_lib.ITC_Stamp_getId(pp_handle[0], pp_id_handle))
+#     return pp_id_handle

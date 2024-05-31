@@ -79,6 +79,14 @@ class InactiveEventError(ItcError):
             "This Event is inactive. This is likely because it was previously "
             "used in a destructive operation (such as joining)"
         )
+class InactiveStampError(ItcError):
+    """The Stamp is inactive"""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "This Stamp is inactive. This is likely because it was previously "
+            "used in a destructive operation (such as joining)"
+        )
 
 class ItcCApiError(ItcError):
     """The base for all C API ITC exceptions"""
