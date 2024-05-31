@@ -1,10 +1,10 @@
 from typing import Union
 
-from cffi.backend_ctypes import CTypesData
+from cffi.backend_ctypes import CTypesData as _CTypesData
 
-from ._internals import _wrappers
+from . import extended_api
+from ._internals import wrappers as _wrappers
 from .exceptions import InactiveStampError
-from .extended_api import Event, Id
 
 
 class Stamp(_wrappers.ItcWrapper):
@@ -58,16 +58,16 @@ class Stamp(_wrappers.ItcWrapper):
         return stamp
 
     @property
-    def id_component(self) -> Event:
+    def id_component(self) -> extended_api.Event:
         """Get a copy of the ID component"""
-        id = Id()
+        id = extended_api.Id()
         id._c_type = _wrappers.copy_id_component_of_stamp(self._c_type)
         return id
 
     @property
-    def event_component(self) -> Event:
+    def event_component(self) -> extended_api.Event:
         """Get a copy of the Event component"""
-        event = Event()
+        event = extended_api.Event()
         event._c_type = _wrappers.copy_event_component_of_stamp(self._c_type)
         return event
 
@@ -185,7 +185,7 @@ class Stamp(_wrappers.ItcWrapper):
                   _wrappers.StampComparisonResult.GREATER_THAN)
         )
 
-    def _new_c_type(self) -> CTypesData:
+    def _new_c_type(self) -> _CTypesData:
         """Create a new ITC Stamp. Only used during initialisation"""
         return _wrappers.new_stamp()
 
@@ -194,7 +194,7 @@ class Stamp(_wrappers.ItcWrapper):
         _wrappers.free_stamp(c_type)
 
     @_wrappers.ItcWrapper._c_type.getter
-    def _c_type(self) -> CTypesData:
+    def _c_type(self) -> _CTypesData:
         """Get the underlying CFFI cdata object"""
         if not _wrappers.is_handle_valid(super()._c_type):
             raise InactiveStampError()

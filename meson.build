@@ -103,7 +103,7 @@ python.install_sources(
 python.install_sources(
     files([
         'pyitc' / '_internals' / '__init__.py',
-        'pyitc' / '_internals' / '_wrappers.py',
+        'pyitc' / '_internals' / 'wrappers.py',
     ]),
     subdir: meson.project_name() / '_internals',
 )

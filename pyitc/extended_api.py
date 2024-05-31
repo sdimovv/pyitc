@@ -1,9 +1,9 @@
 
 from typing import Union
 
-from cffi.backend_ctypes import CTypesData
+from cffi.backend_ctypes import CTypesData as _CTypesData
 
-from ._internals import _wrappers
+from ._internals import wrappers as _wrappers
 from .exceptions import InactiveEventError, InactiveIdError
 
 
@@ -97,7 +97,7 @@ class Id(_wrappers.ItcWrapper):
         for id in other_id:
             _wrappers.sum_id(self._c_type, id._c_type)
 
-    def _new_c_type(self) -> CTypesData:
+    def _new_c_type(self) -> _CTypesData:
         """Create a new ITC ID. Only used during initialisation"""
         c_type = _wrappers.new_id(self._seed)
         del self._seed
@@ -108,7 +108,7 @@ class Id(_wrappers.ItcWrapper):
         _wrappers.free_id(c_type)
 
     @_wrappers.ItcWrapper._c_type.getter
-    def _c_type(self) -> CTypesData:
+    def _c_type(self) -> _CTypesData:
         """Get the underlying CFFI cdata object"""
         if not _wrappers.is_handle_valid(super()._c_type):
             raise InactiveIdError()
@@ -164,7 +164,7 @@ class Event(_wrappers.ItcWrapper):
         event._c_type = _wrappers.deserialise_event(bytes(buffer))
         return event
 
-    def _new_c_type(self) -> CTypesData:
+    def _new_c_type(self) -> _CTypesData:
         """Create a new ITC Event. Only used during initialisation"""
         return _wrappers.new_event()
 
@@ -173,7 +173,7 @@ class Event(_wrappers.ItcWrapper):
         _wrappers.free_event(c_type)
 
     @_wrappers.ItcWrapper._c_type.getter
-    def _c_type(self) -> CTypesData:
+    def _c_type(self) -> _CTypesData:
         """Get the underlying CFFI cdata object"""
         if not _wrappers.is_handle_valid(super()._c_type):
             raise InactiveEventError()
