@@ -180,7 +180,7 @@ class Stamp(_wrappers.ItcWrapper):
 
         return bool(
             _wrappers.compare_stamps(self._c_type, other._c_type) &
-                ~(_wrappers.StampComparisonResult.CONCURRENT |
+                (_wrappers.StampComparisonResult.CONCURRENT |
                   _wrappers.StampComparisonResult.LESS_THAN |
                   _wrappers.StampComparisonResult.GREATER_THAN)
         )
