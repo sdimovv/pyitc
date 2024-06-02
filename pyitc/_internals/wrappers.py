@@ -113,13 +113,14 @@ def _new_stamp_pp_handle() -> CTypesData:
     return _ffi.new("ITC_Stamp_t **")
 
 def _call_serialisation_func(
-        func: Callable,
+        func: Callable[[CTypesData, CTypesData, CTypesData], int],
         pp_handle: CTypesData,
         initial_array_size: int = 64,
         max_array_size: int = 4 * 1024) -> bytes:
     """Call an ITC serialisation function
 
-    :param func: The function to call
+    :param func: The function to call. It is assumed it takes the passed in
+    handle as first argument, followed by the array and array size args
     :type func: Callable
     :param pp_handle: The ITC handle
     :type p_handle: CTypesData
@@ -156,6 +157,31 @@ def _call_serialisation_func(
     _handle_c_return_status(status)
 
     return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
+
+
+def _call_deserialisation_func(
+        new_pp_handle_func: Callable[[], CTypesData],
+        func: Callable[[CTypesData, CTypesData, CTypesData], int],
+        buffer: Union[bytes, bytearray]) -> CTypesData:
+    """Call an ITC deserialisation function
+
+    :param new_pp_handle_func: Method returning an uninitalised handle
+    of the desired ITC type.
+    :type new_pp_handle_func: Callable
+    :param func: The function to call. It is assumed it takes the buffer
+    as the first arg, followed by the buffer size and finally the handle
+    :type func: Callable
+    :param buffer: The buffer containing the serialised data
+    :type buffer: Union[bytes, bytearray]
+    :returns: The handle to the deserialised ITC type
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = new_pp_handle_func()
+    c_buffer = _ffi.from_buffer("uint8_t[]", buffer, require_writable=False)
+    c_buffer_size = len(c_buffer)
+    _handle_c_return_status(func(c_buffer, c_buffer_size, pp_handle))
+    return pp_handle
 
 def is_handle_valid(pp_handle) -> bool:
     """Validate an ID/Event/Stamp handle
@@ -275,12 +301,11 @@ def deserialise_id(buffer: Union[bytes, bytearray]) -> CTypesData:
     :rtype: CTypesData
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    pp_handle = _new_id_pp_handle()
-    c_buffer = _ffi.from_buffer("uint8_t[]", buffer, require_writable=False)
-    c_buffer_size = len(c_buffer)
-    _handle_c_return_status(
-        _lib.ITC_SerDes_deserialiseId(c_buffer, c_buffer_size, pp_handle))
-    return pp_handle
+    return _call_deserialisation_func(
+        _new_id_pp_handle,
+        _lib.ITC_SerDes_deserialiseId,
+        buffer
+    )
 
 def is_id_valid(pp_handle: CTypesData) -> bool:
     """Check whether the given ITC ID is valid
@@ -357,12 +382,11 @@ def deserialise_event(buffer: Union[bytes, bytearray]) -> CTypesData:
     :rtype: CTypesData
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    pp_handle = _new_event_pp_handle()
-    c_buffer = _ffi.from_buffer("uint8_t[]", buffer, require_writable=False)
-    c_buffer_size = len(c_buffer)
-    _handle_c_return_status(
-        _lib.ITC_SerDes_deserialiseEvent(c_buffer, c_buffer_size, pp_handle))
-    return pp_handle
+    return _call_deserialisation_func(
+        _new_event_pp_handle,
+        _lib.ITC_SerDes_deserialiseEvent,
+        buffer
+    )
 
 def is_event_valid(pp_handle: CTypesData) -> bool:
     """Check whether the given ITC Event is valid
@@ -533,12 +557,11 @@ def deserialise_stamp(buffer: Union[bytes, bytearray]) -> CTypesData:
     :rtype: CTypesData
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    pp_handle = _new_stamp_pp_handle()
-    c_buffer = _ffi.from_buffer("uint8_t[]", buffer, require_writable=False)
-    c_buffer_size = len(c_buffer)
-    _handle_c_return_status(
-        _lib.ITC_SerDes_deserialiseStamp(c_buffer, c_buffer_size, pp_handle))
-    return pp_handle
+    return _call_deserialisation_func(
+        _new_stamp_pp_handle,
+        _lib.ITC_SerDes_deserialiseStamp,
+        buffer
+    )
 
 def is_stamp_valid(pp_handle: CTypesData) -> bool:
     """Check whether the given ITC Stamp is valid
