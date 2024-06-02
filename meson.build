@@ -15,6 +15,7 @@ project('pyitc', 'c',
 libitc_c_args = [
     '-DITC_CONFIG_ENABLE_EXTENDED_API=1',
     '-DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
+    '-DITC_CONFIG_ENABLE_SERIALISE_TO_STRING_API=1',
 ]
 
 pyitc_pyext_name = '_@0@'.format(meson.project_name())

@@ -290,6 +290,15 @@ def serialise_id(pp_handle: CTypesData) -> bytes:
     """
     return _call_serialisation_func(_lib.ITC_SerDes_serialiseId, pp_handle)
 
+def serialise_id_to_string(pp_handle: CTypesData) -> bytes:
+    """Serialise the given ITC ID to ASCII string
+
+    :returns: The buffer with the serialised ID
+    :rtype: bytes
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    return _call_serialisation_func(_lib.ITC_SerDes_serialiseIdToString, pp_handle)
+
 def deserialise_id(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deserialise an ITC ID
 
@@ -370,6 +379,18 @@ def serialise_event(pp_handle: CTypesData) -> bytes:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     return _call_serialisation_func(_lib.ITC_SerDes_serialiseEvent, pp_handle)
+
+def serialise_event_to_string(pp_handle: CTypesData) -> bytes:
+    """Serialise the given ITC Event to ASCII string
+
+    :returns: The buffer with the serialised Event
+    :rtype: bytes
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    return _call_serialisation_func(
+        _lib.ITC_SerDes_serialiseEventToString,
+        pp_handle,
+        initial_array_size=128)
 
 def deserialise_event(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deerialise an ITC Event
@@ -544,6 +565,19 @@ def serialise_stamp(pp_handle: CTypesData) -> bytes:
     return _call_serialisation_func(
          _lib.ITC_SerDes_serialiseStamp,
          pp_handle,
+    )
+
+def serialise_stamp_to_string(pp_handle: CTypesData) -> bytes:
+    """Serialise the given ITC Stamp to ASCII string
+
+    :returns: The buffer with the serialised Stamp
+    :rtype: bytes
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    return _call_serialisation_func(
+        _lib.ITC_SerDes_serialiseStampToString,
+        pp_handle,
+        initial_array_size=128
     )
 
 def deserialise_stamp(buffer: Union[bytes, bytearray]) -> CTypesData:
