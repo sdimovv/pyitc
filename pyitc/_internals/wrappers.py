@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import IntEnum
-from typing import Optional, Union
+from typing import Callable, Optional, Union
 
 from cffi.backend_ctypes import CTypesData
 
@@ -68,7 +68,7 @@ class ItcWrapper(ABC):
 
     @_c_type.deleter
     def _c_type(self) -> None:
-        """Delete the underlying CFFI cdata object"""
+        """Deallocate the underlying CFFI cdata object"""
         if is_handle_valid(self.__internal_c_type):
             self._del_c_type(self.__internal_c_type)
 
@@ -111,6 +111,51 @@ def _new_stamp_pp_handle() -> CTypesData:
     This handle will be automatically freed when no longer referenced.
     """
     return _ffi.new("ITC_Stamp_t **")
+
+def _call_serialisation_func(
+        func: Callable,
+        pp_handle: CTypesData,
+        initial_array_size: int = 64,
+        max_array_size: int = 4 * 1024) -> bytes:
+    """Call an ITC serialisation function
+
+    :param func: The function to call
+    :type func: Callable
+    :param pp_handle: The ITC handle
+    :type p_handle: CTypesData
+    :param initial_array_size: The initial size of the C array to be passed to
+    the serialisation function. This size will be doubled each time if the call
+    fails with :class:`ItcStatus.INSUFFICIENT_RESOURCES`, and a new call
+    attempt will be made until the call either succeeds or `max_array_size` is
+    reached.
+    :type initial_array_size: int
+    :param max_array_size: The max allowed size of the C array before giving up
+    :type max_array_size: int
+    :returns: The buffer holding the serialised data
+    :rtype: bytes
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    if initial_array_size < 1:
+        raise ValueError("initial_array_size must be >= 1")
+    if max_array_size < 1:
+        raise ValueError("max_array_size must be >= 1")
+
+    c_array_size = initial_array_size
+    c_array: CTypesData
+    p_c_array_size = _ffi.new("uint32_t *")
+
+    status = ItcStatus.INSUFFICIENT_RESOURCES
+    while status == ItcStatus.INSUFFICIENT_RESOURCES and c_array_size <= max_array_size:
+        c_array = _ffi.new("uint8_t[]", c_array_size)
+        p_c_array_size[0] = len(c_array)
+        status = func(pp_handle[0], c_array, p_c_array_size)
+        # If the call fails with insufficient resources, try again with a
+        # bigger buffer
+        c_array_size *= 2
+
+    _handle_c_return_status(status)
+
+    return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
 
 def is_handle_valid(pp_handle) -> bool:
     """Validate an ID/Event/Stamp handle
@@ -217,22 +262,7 @@ def serialise_id(pp_handle: CTypesData) -> bytes:
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    c_array_size = 64
-    c_array: CTypesData
-    p_c_array_size = _ffi.new("uint32_t *")
-
-    status = ItcStatus.INSUFFICIENT_RESOURCES
-    while status == ItcStatus.INSUFFICIENT_RESOURCES:
-        c_array = _ffi.new("uint8_t[]", c_array_size)
-        p_c_array_size[0] = len(c_array)
-        status = _lib.ITC_SerDes_serialiseId(pp_handle[0], c_array, p_c_array_size)
-        # If the call fails with insufficient resources, try again with a
-        # bigger buffer
-        c_array_size *= 2
-
-    _handle_c_return_status(status)
-
-    return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
+    return _call_serialisation_func(_lib.ITC_SerDes_serialiseId, pp_handle)
 
 def deserialise_id(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deserialise an ITC ID
@@ -314,22 +344,7 @@ def serialise_event(pp_handle: CTypesData) -> bytes:
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    c_array_size = 64
-    c_array: CTypesData
-    p_c_array_size = _ffi.new("uint32_t *")
-
-    status = ItcStatus.INSUFFICIENT_RESOURCES
-    while status == ItcStatus.INSUFFICIENT_RESOURCES:
-        c_array = _ffi.new("uint8_t[]", c_array_size)
-        p_c_array_size[0] = len(c_array)
-        status = _lib.ITC_SerDes_serialiseEvent(pp_handle[0], c_array, p_c_array_size)
-        # If the call fails with insufficient resources, try again with a
-        # bigger buffer
-        c_array_size *= 2
-
-    _handle_c_return_status(status)
-
-    return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
+    return _call_serialisation_func(_lib.ITC_SerDes_serialiseEvent, pp_handle)
 
 def deserialise_event(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deerialise an ITC Event
@@ -502,22 +517,10 @@ def serialise_stamp(pp_handle: CTypesData) -> bytes:
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    c_array_size = 64
-    c_array: CTypesData
-    p_c_array_size = _ffi.new("uint32_t *")
-
-    status = ItcStatus.INSUFFICIENT_RESOURCES
-    while status == ItcStatus.INSUFFICIENT_RESOURCES:
-        c_array = _ffi.new("uint8_t[]", c_array_size)
-        p_c_array_size[0] = len(c_array)
-        status = _lib.ITC_SerDes_serialiseStamp(pp_handle[0], c_array, p_c_array_size)
-        # If the call fails with insufficient resources, try again with a
-        # bigger buffer
-        c_array_size *= 2
-
-    _handle_c_return_status(status)
-
-    return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
+    return _call_serialisation_func(
+         _lib.ITC_SerDes_serialiseStamp,
+         pp_handle,
+    )
 
 def deserialise_stamp(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deserialise an ITC Stamp
