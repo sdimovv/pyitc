@@ -69,7 +69,7 @@ class Id(_wrappers.ItcWrapper):
         """
         return Id(_c_type=_wrappers.split_id(self._c_type))
 
-    def sum(self, *other_id: "Id") -> None:
+    def sum(self, *other_id: "Id") -> "Id":
         """Sum ID interval(s)
 
         After the sumation, this ID becomes the owner of the summed interval(s),
@@ -77,6 +77,8 @@ class Id(_wrappers.ItcWrapper):
 
         :param other_id: The ID to be summed with
         :type other_id: Id
+        :returns: self
+        :rtype: Id
         :raises TypeError: If :param:`other_id` is not of type :class:`Id`
         :raises ValueError: If both IDs are of the same instance
         :raises ItcError: If something goes wrong during the sumation
@@ -89,6 +91,8 @@ class Id(_wrappers.ItcWrapper):
 
         for id in other_id:
             _wrappers.sum_id(self._c_type, id._c_type)
+
+        return self
 
     def _new_c_type(self) -> _CTypesData:
         """Create a new ITC ID. Only used during initialisation"""

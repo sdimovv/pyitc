@@ -85,14 +85,22 @@ class Stamp(_wrappers.ItcWrapper):
         """
         return Stamp(_c_type=_wrappers.fork_stamp(self._c_type))
 
-    def event(self) -> None:
+    def event(self, count: int = 1) -> "Stamp":
         """Add an event to the Stamp (inflate it)
 
+        :returns: self
+        :rtype: Stamp
         :raises ItcError: If something goes wrong during the inflation
         """
-        _wrappers.inflate_stamp(self._c_type)
+        if count < 1:
+            raise ValueError("count must be >= 1")
 
-    def join(self, *other_stamp: "Stamp") -> None:
+        for _ in range(count):
+            _wrappers.inflate_stamp(self._c_type)
+
+        return self
+
+    def join(self, *other_stamp: "Stamp") -> "Stamp":
         """Join Stamp interval(s)
 
         After joining, this Stamp becomes the owner of the joined interval(s),
@@ -100,6 +108,8 @@ class Stamp(_wrappers.ItcWrapper):
 
         :param other_stamp: The Stamp to be joined with
         :type other_stamp: Stamp
+        :returns: self
+        :rtype: Stamp
         :raises TypeError: If :param:`other_stamp` is not of type :class:`Stamp`
         :raises ValueError: If both Stamps are of the same instance
         :raises ItcError: If something goes wrong during the joining
@@ -113,6 +123,8 @@ class Stamp(_wrappers.ItcWrapper):
 
         for stamp in other_stamp:
             _wrappers.join_stamp(self._c_type, stamp._c_type)
+
+        return self
 
     def __lt__(self, other: "Stamp") -> bool:
         if not isinstance(other, Stamp):
