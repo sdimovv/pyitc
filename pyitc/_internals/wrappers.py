@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import IntEnum
-from typing import Callable, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 from cffi.backend_ctypes import CTypesData
 
@@ -63,7 +63,7 @@ class ItcWrapper(ABC):
         """Repr the object"""
         return f"<{self.__class__.__name__} = {str(self)}>"
 
-    def __deepcopy__(self) -> 'ItcWrapper':
+    def __deepcopy__(self, *args: Any) -> 'ItcWrapper':
         return self.clone()
 
     @property
