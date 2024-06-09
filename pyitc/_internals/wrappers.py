@@ -442,6 +442,42 @@ def new_stamp() -> CTypesData:
     _handle_c_return_status(_lib.ITC_Stamp_newSeed(pp_handle))
     return pp_handle
 
+def new_stamp_from_id(pp_id_handle: CTypesData) -> CTypesData:
+    """Allocate a new ITC seed Stamp from an existing ID
+
+    The Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
+
+    :param pp_id_handle: The handle of the ID
+    :type pp_id_handle: CTypesData
+    :returns: The ITC seed Stamp handle
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = _new_stamp_pp_handle()
+    _handle_c_return_status(_lib.ITC_Stamp_newFromId(pp_id_handle[0], pp_handle))
+    return pp_handle
+
+def new_stamp_from_id_and_event(pp_id_handle: CTypesData, pp_event_handle: CTypesData) -> CTypesData:
+    """Allocate a new ITC seed Stamp from an existing ID and Event
+
+    The Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
+
+    :param pp_id_handle: The handle of the ID
+    :type pp_id_handle: CTypesData
+    :param pp_event_handle: The handle of the Event
+    :type pp_event_handle: CTypesData
+    :returns: The ITC seed Stamp handle
+    :rtype: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    pp_handle = _new_stamp_pp_handle()
+    _handle_c_return_status(
+        _lib.ITC_Stamp_newFromIdAndEvent(
+            pp_id_handle[0],
+            pp_event_handle[0],
+            pp_handle))
+    return pp_handle
+
 def new_peek_stamp(pp_src_handle: CTypesData) -> CTypesData:
     """Allocate a new ITC peek Stamp from a regular Stamp
 
@@ -617,10 +653,11 @@ def is_stamp_valid(pp_handle: CTypesData) -> bool:
 
     return is_valid
 
-def copy_id_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
+def get_id_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
     """Get a copy of the ID component of a Stamp
 
     :param pp_handle: The handle of the source Stamp.
+    :type pp_handle: CTypesData
     :returns: The handle of the ID
     :rtype: CTypesData
     :raises ItcCApiError: If something goes wrong while inside the C API
@@ -629,10 +666,24 @@ def copy_id_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
     _handle_c_return_status(_lib.ITC_Stamp_getId(pp_handle[0], pp_id_handle))
     return pp_id_handle
 
-def copy_event_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
+def set_id_copmponent_of_stamp(pp_stamp_handle: CTypesData, pp_id_handle: CTypesData) -> CTypesData:
+    """Set the ID component of a Stamp
+
+
+    :param pp_handle: The handle of the Stamp.
+    :type pp_handle: CTypesData
+    :param pp_id_handle: The new ID component handle. A copy of it will be set
+    as the new ID component of the Stamp.
+    :type pp_id_handle: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    _handle_c_return_status(_lib.ITC_Stamp_setId(pp_stamp_handle[0], pp_id_handle[0]))
+
+def get_event_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
     """Get a copy of the Event component of a Stamp
 
     :param pp_handle: The handle of the source Stamp.
+    :type pp_handle: CTypesData
     :returns: The handle of the Event
     :rtype: CTypesData
     :raises ItcCApiError: If something goes wrong while inside the C API
@@ -641,14 +692,15 @@ def copy_event_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
     _handle_c_return_status(_lib.ITC_Stamp_getEvent(pp_handle[0], pp_event_handle))
     return pp_event_handle
 
-# def set_id_in_stamp(p_stamp_handle: CTypesData, p_id_handle: CTypesData) -> CTypesData:
-#     """Set the ID component of a Stamp
+def set_event_copmponent_of_stamp(pp_stamp_handle: CTypesData, pp_event_handle: CTypesData) -> CTypesData:
+    """Set the Event component of a Stamp
 
-#     :param pp_handle: The handle of the source Stamp.
-#     :returns: The handle of the ID
-#     :rtype: CTypesData
-#     :raises ItcCApiError: If something goes wrong while inside the C API
-#     """
-#     pp_id_handle = _new_id_pp_handle()
-#     _handle_c_return_status(_lib.ITC_Stamp_getId(pp_handle[0], pp_id_handle))
-#     return pp_id_handle
+
+    :param pp_handle: The handle of the Stamp.
+    :type pp_handle: CTypesData
+    :param pp_event_handle: The new Event component handle. A copy of it will be
+    set as the new Event component of the Stamp.
+    :type pp_event_handle: CTypesData
+    :raises ItcCApiError: If something goes wrong while inside the C API
+    """
+    _handle_c_return_status(_lib.ITC_Stamp_setEvent(pp_stamp_handle[0], pp_event_handle[0]))

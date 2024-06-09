@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Optional, Union
 
 from cffi.backend_ctypes import CTypesData as _CTypesData
 
@@ -9,6 +9,25 @@ from .exceptions import InactiveStampError, ItcError
 
 class Stamp(_wrappers.ItcWrapper):
     """The Interval Tree Clock's Stamp"""
+
+    def __init__(
+            self,
+            id: Optional[extended_api.Id] = None,
+            event: Optional[extended_api.Event] = None,
+            **kwargs: Any) -> None:
+        """Create a new Stamp"""
+        if id and not isinstance(id, extended_api.Id):
+            raise TypeError(
+                f"Expected instance of Id, got id={type(id)}")
+        if event and not isinstance(event, extended_api.Event):
+            raise TypeError(
+                f"Expected instance of Event, got event={type(event)}")
+
+        self._id = id
+        self._event = event
+        super().__init__(**kwargs)
+        del self._id
+        del self._event
 
     def is_valid(self) -> bool:
         """Validate the Stamp"""
@@ -56,13 +75,30 @@ class Stamp(_wrappers.ItcWrapper):
     def id_component(self) -> extended_api.Id:
         """Get a copy of the ID component"""
         return extended_api.Id(
-            _c_type=_wrappers.copy_id_component_of_stamp(self._c_type))
+            _c_type=_wrappers.get_id_component_of_stamp(self._c_type))
+
+    @id_component.setter
+    def id_component(self, id: extended_api.Id) -> None:
+        """Replace the ID component of the Stamp with a copy of the input Id"""
+        if not isinstance(id, extended_api.Id):
+            raise TypeError(f"Expected instance of Id, got id={type(id)}")
+
+        _wrappers.set_id_copmponent_of_stamp(self._c_type, id._c_type)
 
     @property
     def event_component(self) -> extended_api.Event:
         """Get a copy of the Event component"""
         return extended_api.Event(
-            _c_type=_wrappers.copy_event_component_of_stamp(self._c_type))
+            _c_type=_wrappers.get_event_component_of_stamp(self._c_type))
+
+    @event_component.setter
+    def event_component(self, event: extended_api.Event) -> None:
+        """Replace the Event component of the Stamp with a copy of the input Event"""
+        if not isinstance(event, extended_api.Event):
+            raise TypeError(
+                f"Expected instance of Event, got event={type(event)}")
+
+        _wrappers.set_event_copmponent_of_stamp(self._c_type, event._c_type)
 
     def peek(self) -> "Stamp":
         """Create a peek Stamp (Stamp with NULL ID) from the current Stamp
@@ -194,6 +230,20 @@ class Stamp(_wrappers.ItcWrapper):
 
     def _new_c_type(self) -> _CTypesData:
         """Create a new ITC Stamp. Only used during initialisation"""
+        if self._id and self._event:
+            return _wrappers.new_stamp_from_id_and_event(
+                self._id._c_type, self._event._c_type)
+
+        if self._id:
+            return _wrappers.new_stamp_from_id(self._id._c_type)
+
+        if self._event:
+            id = _wrappers.new_id(seed=True)
+            stamp = _wrappers.new_stamp_from_id_and_event(
+                id, self._event._c_type)
+            _wrappers.free_id(id)
+            return stamp
+
         return _wrappers.new_stamp()
 
     def _del_c_type(self, c_type: _CTypesData) -> None:
