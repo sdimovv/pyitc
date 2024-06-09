@@ -44,7 +44,7 @@ class ItcWrapper(ABC):
         """Allocate a new ITC/Event/Stamp"""
 
     @abstractmethod
-    def _del_c_type(self, c_type) -> None:
+    def _del_c_type(self, c_type: CTypesData) -> None:
         """Free the ITC/Event/Stamp stored in `self._c_type`"""
 
     def __init__(self, _c_type: Optional[CTypesData] = None) -> None:
@@ -78,7 +78,7 @@ class ItcWrapper(ABC):
             self._del_c_type(self.__internal_c_type)
 
     @_c_type.setter
-    def _c_type(self, c_type) -> None:
+    def _c_type(self, c_type: CTypesData) -> None:
         """Set the underlying CFFI cdata object"""
         del self._c_type
         self.__internal_c_type = c_type

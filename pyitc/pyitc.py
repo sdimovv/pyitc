@@ -196,7 +196,7 @@ class Stamp(_wrappers.ItcWrapper):
         """Create a new ITC Stamp. Only used during initialisation"""
         return _wrappers.new_stamp()
 
-    def _del_c_type(self, c_type) -> None:
+    def _del_c_type(self, c_type: _CTypesData) -> None:
         """Delete the underlying CFFI cdata object"""
         _wrappers.free_stamp(c_type)
 

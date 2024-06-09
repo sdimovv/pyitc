@@ -106,7 +106,7 @@ class Id(_wrappers.ItcWrapper):
         """Create a new ITC ID. Only used during initialisation"""
         return _wrappers.new_id(self._seed)
 
-    def _del_c_type(self, c_type) -> None:
+    def _del_c_type(self, c_type: _CTypesData) -> None:
         """Delete the underlying CFFI cdata object"""
         _wrappers.free_id(c_type)
 
@@ -174,7 +174,7 @@ class Event(_wrappers.ItcWrapper):
         """Create a new ITC Event. Only used during initialisation"""
         return _wrappers.new_event()
 
-    def _del_c_type(self, c_type) -> None:
+    def _del_c_type(self, c_type: _CTypesData) -> None:
         """Delete the underlying CFFI cdata object"""
         _wrappers.free_event(c_type)
 
