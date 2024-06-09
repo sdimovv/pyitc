@@ -40,6 +40,10 @@ class ItcWrapper(ABC):
         pass
 
     @abstractmethod
+    def __str__(self) -> str:
+        """Serialise an ID/Event/Stamp to string"""
+
+    @abstractmethod
     def _new_c_type(self) -> CTypesData:
         """Allocate a new ITC/Event/Stamp"""
         pass
@@ -60,6 +64,10 @@ class ItcWrapper(ABC):
     def __del__(self) -> None:
         """Deallocate the object"""
         del self._c_type
+
+    def __repr__(self) -> str:
+        """Repr the object"""
+        return f"<{self.__class__.__name__} = {str(self)}>"
 
     @property
     def _c_type(self) -> CTypesData:

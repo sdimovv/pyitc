@@ -4,7 +4,7 @@ from typing import Any, Union
 from cffi.backend_ctypes import CTypesData as _CTypesData
 
 from ._internals import wrappers as _wrappers
-from .exceptions import InactiveEventError, InactiveIdError
+from .exceptions import InactiveEventError, InactiveIdError, ItcError
 
 
 class Id(_wrappers.ItcWrapper):
@@ -94,6 +94,14 @@ class Id(_wrappers.ItcWrapper):
 
         return self
 
+    def __str__(self) -> str:
+        """Serialise an ID to string"""
+        try:
+            return _wrappers.serialise_id_to_string(self._c_type) \
+                .decode('ascii').rstrip('\0')
+        except ItcError:
+            return "???"
+
     def _new_c_type(self) -> _CTypesData:
         """Create a new ITC ID. Only used during initialisation"""
         return _wrappers.new_id(self._seed)
@@ -153,6 +161,14 @@ class Event(_wrappers.ItcWrapper):
                 f"got buffer={type(buffer)}")
 
         return Event(_c_type=_wrappers.deserialise_event(bytes(buffer)))
+
+    def __str__(self) -> str:
+        """Serialise an Event to string"""
+        try:
+            return _wrappers.serialise_event_to_string(self._c_type) \
+                .decode('ascii').rstrip('\0')
+        except ItcError:
+            return "???"
 
     def _new_c_type(self) -> _CTypesData:
         """Create a new ITC Event. Only used during initialisation"""

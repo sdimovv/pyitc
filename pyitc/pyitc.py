@@ -4,7 +4,7 @@ from cffi.backend_ctypes import CTypesData as _CTypesData
 
 from . import extended_api
 from ._internals import wrappers as _wrappers
-from .exceptions import InactiveStampError
+from .exceptions import InactiveStampError, ItcError
 
 
 class Stamp(_wrappers.ItcWrapper):
@@ -125,6 +125,14 @@ class Stamp(_wrappers.ItcWrapper):
             _wrappers.join_stamp(self._c_type, stamp._c_type)
 
         return self
+
+    def __str__(self) -> str:
+        """Serialise a Stamp to string"""
+        try:
+            return _wrappers.serialise_stamp_to_string(self._c_type) \
+                .decode('ascii').rstrip('\0')
+        except ItcError:
+            return "???"
 
     def __lt__(self, other: "Stamp") -> bool:
         if not isinstance(other, Stamp):
