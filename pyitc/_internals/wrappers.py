@@ -21,23 +21,19 @@ class ItcWrapper(ABC):
     @abstractmethod
     def clone(self) -> "ItcWrapper":
         """Deep clone object"""
-        pass
 
     @abstractmethod
     def is_valid(self) -> bool:
         """Check the object is in a valid state"""
-        pass
 
     @abstractmethod
     def serialise(self) -> bytes:
         """Serialise the ID/Event/Stamp"""
-        pass
 
     @classmethod
     @abstractmethod
     def deserialise(cls, buffer: Union[bytes, bytearray]) -> "ItcWrapper":
         """Deserialise an ID/Event/Stamp"""
-        pass
 
     @abstractmethod
     def __str__(self) -> str:
@@ -46,12 +42,10 @@ class ItcWrapper(ABC):
     @abstractmethod
     def _new_c_type(self) -> CTypesData:
         """Allocate a new ITC/Event/Stamp"""
-        pass
 
     @abstractmethod
     def _del_c_type(self, c_type) -> None:
         """Free the ITC/Event/Stamp stored in `self._c_type`"""
-        pass
 
     def __init__(self, _c_type: Optional[CTypesData] = None) -> None:
         """Initialise a new ITC ID/Event/Stamp"""
@@ -68,6 +62,9 @@ class ItcWrapper(ABC):
     def __repr__(self) -> str:
         """Repr the object"""
         return f"<{self.__class__.__name__} = {str(self)}>"
+
+    def __deepcopy__(self) -> 'ItcWrapper':
+        return self.clone()
 
     @property
     def _c_type(self) -> CTypesData:
