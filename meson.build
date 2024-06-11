@@ -31,6 +31,7 @@ libitc_proj = subproject(
     required: true,
     default_options: {
         'default_library': 'static',
+        'tests': false
     },
 )
 libitc_dep = libitc_proj.get_variable('libitc_dep')
