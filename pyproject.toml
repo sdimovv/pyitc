@@ -1,0 +1,23 @@
+[project]
+name = "pyitc"
+version = "0.1.0"
+description = "Python bindings for the libitc library"
+readme = 'README.md'
+requires-python = '>=3.7'
+license = {file = 'LICENSE'}
+urls.repository = "https://github.com/sdimovv/pyitc"
+
+[tool.meson-python.args]
+# setup = []
+# compile = []
+install = ['--skip-subprojects']
+dist = ['--include-subprojects']
+
+[build-system]
+requires = [
+  "meson-python>=0.16.0",
+  'meson>=1.4.0',
+  'ninja',
+  'cffi>=1.16'
+]
+build-backend = 'mesonpy'

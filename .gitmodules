@@ -1,0 +1,3 @@
+[submodule "vendor/libitc"]
+	path = vendor/libitc
+	url = https://github.com/sdimovv/libitc
