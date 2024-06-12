@@ -93,18 +93,18 @@ python.extension_module(
 
 python.install_sources(
     files([
-        'src' / '__init__.py',
-        'src' / 'extended_api.py',
-        'src' / 'pyitc.py',
-        'src' / 'exceptions.py',
+        'src' / 'pyitc' / '__init__.py',
+        'src' / 'pyitc' / 'extended_api.py',
+        'src' / 'pyitc' / 'pyitc.py',
+        'src' / 'pyitc' / 'exceptions.py',
     ]),
     subdir: meson.project_name(),
 )
 
 python.install_sources(
     files([
-        'src' / '_internals' / '__init__.py',
-        'src' / '_internals' / 'wrappers.py',
+        'src' / 'pyitc' / '_internals' / '__init__.py',
+        'src' / 'pyitc' / '_internals' / 'wrappers.py',
     ]),
     subdir: meson.project_name() / '_internals',
 )
