@@ -57,7 +57,10 @@ class ItcWrapper(ABC):
 
     def __del__(self) -> None:
         """Deallocate the object"""
-        del self._c_type
+        try:
+            del self._c_type
+        except AttributeError:
+            pass
 
     def __repr__(self) -> str:
         """Repr the object"""
@@ -76,12 +79,6 @@ class ItcWrapper(ABC):
         """Deallocate the underlying CFFI cdata object"""
         if is_handle_valid(self.__internal_c_type):
             self._del_c_type(self.__internal_c_type)
-
-    @_c_type.setter
-    def _c_type(self, c_type: CTypesData) -> None:
-        """Set the underlying CFFI cdata object"""
-        del self._c_type
-        self.__internal_c_type = c_type
 
 
 def _handle_c_return_status(status: Union[int, ItcStatus]) -> None:
