@@ -88,7 +88,7 @@ def _handle_c_return_status(status: Union[int, ItcStatus]) -> None:
 
     exc_candidates = [x for x in ItcCApiError.__subclasses__() if x.STATUS == status]
 
-    if not exc_candidates:
+    if not exc_candidates: # pragma: no cover
         raise UnkownError(status)
 
     raise exc_candidates[0]()
