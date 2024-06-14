@@ -162,6 +162,19 @@ class Stamp(_wrappers.ItcWrapper):
 
         return self
 
+    @classmethod
+    def check_concurrent(cls, stamp1: 'Stamp', stamp2: 'Stamp') -> bool:
+        """Check if two Stamps are concurrent
+
+        :returns: True if the two Stamps are concurrent, False otherwise
+        :rtype: bool
+        :raises ItcError: If something goes wrong during the operation
+        """
+        return (
+            _wrappers.compare_stamps(stamp1._c_type, stamp2._c_type) ==
+                _wrappers.StampComparisonResult.CONCURRENT
+        )
+
     def __str__(self) -> str:
         """Serialise a Stamp to string"""
         try:
