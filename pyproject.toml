@@ -11,6 +11,7 @@ dependencies = [
 ]
 optional-dependencies.test = [
   "pytest",
+  "pytest-cov",
 ]
 
 [tool.meson-python.args]
