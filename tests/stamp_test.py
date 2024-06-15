@@ -132,6 +132,12 @@ def test_join() -> None:
         obj.join(Stamp())
     assert exc_info.value.status == ItcStatus.OVERLAPPING_ID_INTERVAL
 
+    with pytest.raises(TypeError):
+        obj.join(Event())
+
+    with pytest.raises(ValueError):
+        obj.join(obj)
+
 def test_comparison() -> None:
     """Test comparing Stamps"""
     obj: Stamp = Stamp()

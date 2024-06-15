@@ -68,6 +68,12 @@ def test_sum_id() -> None:
         obj.sum(Id(seed=True))
     assert exc_info.value.status == ItcStatus.OVERLAPPING_ID_INTERVAL
 
+    with pytest.raises(TypeError):
+        obj.sum(Event())
+
+    with pytest.raises(ValueError):
+        obj.sum(obj)
+
 def test_create_event() -> None:
     """Test creating a new Event"""
     assert str(Event()) == "0"

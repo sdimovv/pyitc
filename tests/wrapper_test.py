@@ -39,3 +39,6 @@ def test_serdes(klass) -> None:
     assert len(ser_data) > 0
     assert isinstance(deserialised_obj, klass)
     assert str(obj) == str(deserialised_obj)
+
+    with pytest.raises(TypeError):
+        klass.deserialise([1, 2, 3])
