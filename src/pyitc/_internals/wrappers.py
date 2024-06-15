@@ -259,7 +259,7 @@ def split_id(pp_handle: CTypesData) -> CTypesData:
 
     try:
         _handle_c_return_status(_lib.ITC_Id_split(pp_handle, pp_other_handle))
-    except Exception:
+    except Exception: # pragma: no cover
         # The other handle cannot be returned. Destroy it
         if is_handle_valid(pp_other_handle):
             free_id(pp_other_handle)
@@ -535,7 +535,7 @@ def fork_stamp(pp_handle: CTypesData) -> CTypesData:
 
     try:
         _handle_c_return_status(_lib.ITC_Stamp_fork(pp_handle, pp_other_handle))
-    except Exception:
+    except Exception: # pragma: no cover
         # The other handle cannot be returned. Destroy it
         if is_handle_valid(pp_other_handle):
             free_stamp(pp_other_handle)
