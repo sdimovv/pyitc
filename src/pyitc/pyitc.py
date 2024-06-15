@@ -170,6 +170,13 @@ class Stamp(_wrappers.ItcWrapper):
         :rtype: bool
         :raises ItcError: If something goes wrong during the operation
         """
+        if not isinstance(stamp1, Stamp):
+            raise TypeError(
+                f"Expected instance of Stamp, got stamp1={type(stamp1)}")
+        if not isinstance(stamp2, Stamp):
+            raise TypeError(
+                f"Expected instance of Stamp, got stamp2={type(stamp2)}")
+
         return (
             _wrappers.compare_stamps(stamp1._c_type, stamp2._c_type) ==
                 _wrappers.StampComparisonResult.CONCURRENT
@@ -184,7 +191,7 @@ class Stamp(_wrappers.ItcWrapper):
             return "???"
 
     def __lt__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp):
+        if not isinstance(other, Stamp): # pragma: no cover
             return NotImplemented
 
         return (
@@ -193,7 +200,7 @@ class Stamp(_wrappers.ItcWrapper):
         )
 
     def __le__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp):
+        if not isinstance(other, Stamp): # pragma: no cover
             return NotImplemented
 
         return bool(
@@ -203,7 +210,7 @@ class Stamp(_wrappers.ItcWrapper):
         )
 
     def __gt__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp):
+        if not isinstance(other, Stamp): # pragma: no cover
             return NotImplemented
 
         return (
@@ -212,7 +219,7 @@ class Stamp(_wrappers.ItcWrapper):
         )
 
     def __ge__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp):
+        if not isinstance(other, Stamp): # pragma: no cover
             return NotImplemented
 
         return bool(
@@ -222,7 +229,7 @@ class Stamp(_wrappers.ItcWrapper):
         )
 
     def __eq__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp):
+        if not isinstance(other, Stamp): # pragma: no cover
             return NotImplemented
 
         return (
@@ -231,7 +238,7 @@ class Stamp(_wrappers.ItcWrapper):
         )
 
     def __ne__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp):
+        if not isinstance(other, Stamp): # pragma: no cover
             return NotImplemented
 
         return bool(
