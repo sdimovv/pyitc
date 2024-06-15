@@ -138,9 +138,9 @@ def _call_serialisation_func(
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    if initial_array_size < 1:
+    if initial_array_size < 1: # pragma: no cover
         raise ValueError("initial_array_size must be >= 1")
-    if max_array_size < 1:
+    if max_array_size < 1: # pragma: no cover
         raise ValueError("max_array_size must be >= 1")
 
     c_array_size = initial_array_size
@@ -154,7 +154,7 @@ def _call_serialisation_func(
         status = func(pp_handle[0], c_array, p_c_array_size)
         # If the call fails with insufficient resources, try again with a
         # bigger buffer
-        c_array_size *= 2
+        c_array_size = min(c_array_size * 2, max_array_size)
 
     _handle_c_return_status(status)
 
