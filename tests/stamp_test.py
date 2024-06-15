@@ -50,6 +50,9 @@ def test_id_component() -> None:
     assert id_comp.is_valid()
     assert str(obj.id_component) == "0"
 
+    with pytest.raises(TypeError):
+        obj.id_component = Event()
+
 def test_event_component() -> None:
     """Test operations over the Event component of a Stamp"""
     obj: Stamp = Stamp()
@@ -61,6 +64,9 @@ def test_event_component() -> None:
     obj.event_component = Stamp().event().event_component
     assert event_comp.is_valid()
     assert str(obj.event_component) == "1"
+
+    with pytest.raises(TypeError):
+        obj.event_component = Id()
 
 def test_peek() -> None:
     """Test getting a peek Stamp"""
