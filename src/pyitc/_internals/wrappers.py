@@ -4,7 +4,7 @@ from typing import Any, Callable, Optional, Union
 
 from cffi.backend_ctypes import CTypesData
 
-from ..exceptions import ItcCApiError, ItcStatus, UnkownError
+from ..exceptions import ItcCApiError, ItcStatus, UnknownError
 from . import _ffi, _lib
 
 
@@ -89,7 +89,7 @@ def _handle_c_return_status(status: Union[int, ItcStatus]) -> None:
     exc_candidates = [x for x in ItcCApiError.__subclasses__() if x.STATUS == status]
 
     if not exc_candidates: # pragma: no cover
-        raise UnkownError(status)
+        raise UnknownError(status)
 
     raise exc_candidates[0]()
 
