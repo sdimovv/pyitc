@@ -2,8 +2,8 @@
 name: Build And Run Tests
 
 on:
-  # push:
-  #   branches: [ main ]
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -16,6 +16,8 @@ jobs:
         os: ['ubuntu-latest']
         compiler: ['gcc']
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Install compiler
         uses: rlalik/setup-cpp-compiler@master
         with:
@@ -28,7 +30,5 @@ jobs:
           cache: 'pip'
       - name: Install Nox
         run: pip install nox
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Run Tests
         run: nox --error-on-missing-interpreters -s tests

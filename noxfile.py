@@ -13,6 +13,5 @@ with open('.python-version', 'r') as f:
 @nox.session(python=SUPPORTED_PYTHON_VERSIONS)
 def test(session: nox.Session) -> None:
     """Run the tests."""
-    session.run('python', '-m', 'ensurepip', '--upgrade')
     session.install('.[test]')
     session.run('pytest', '--cov=pyitc', *session.posargs)
