@@ -25,7 +25,15 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version-file: '.python-version'
+          # python-version-file does not seem to support multiple versions
+          # definition
+          python-version: |
+              3.7
+              3.8
+              3.9
+              3.10
+              3.11
+              3.12
           cache: pip
       - name: Install Nox
         run: pip install nox
