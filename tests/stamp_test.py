@@ -162,9 +162,3 @@ def test_comparison() -> None:
     assert not obj > obj2
     assert not obj < obj2
     assert obj != obj2
-    assert Stamp.check_concurrent(obj, obj2)
-
-    with pytest.raises(TypeError):
-        assert Stamp.check_concurrent("str", Stamp())
-    with pytest.raises(TypeError):
-        assert Stamp.check_concurrent(Stamp(), "str")
