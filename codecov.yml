@@ -1,4 +1,3 @@
-bot: codecov
 ignore:
   - "*/tests/*"
 fixes:
