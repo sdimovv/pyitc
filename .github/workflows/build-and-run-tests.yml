@@ -38,4 +38,14 @@ jobs:
       - name: Install Nox
         run: pip install nox
       - name: Run Tests
-        run: nox --error-on-missing-interpreters -s test
+        run: nox --error-on-missing-interpreters -s test -- --cov-report=xml:reports/coverage.xml --cov-append
+      - name: Publish Coverage Results
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          directory: ./reports/
+          files: ./coverage.xml
+          flags: unittests
+          name: pyitc
+          use_oidc: true
+          verbose: true
