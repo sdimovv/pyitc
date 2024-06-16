@@ -1,0 +1,7 @@
+bot: codecov
+ignore:
+  - "*/tests/*"
+fixes:
+  - "*/site-packages/pyitc::src/pyitc"
+github_checks:
+  annotations: true
