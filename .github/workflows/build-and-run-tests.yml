@@ -34,4 +34,4 @@ jobs:
       - name: Install Nox
         run: pip install nox
       - name: Run Tests
-        run: nox --error-on-missing-interpreters -s tests
+        run: nox --error-on-missing-interpreters -s test
