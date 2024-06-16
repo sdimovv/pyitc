@@ -22,12 +22,13 @@ jobs:
         uses: rlalik/setup-cpp-compiler@master
         with:
           compiler: ${{ matrix.compiler }}
-      - name: Install python
-        uses: actions/setup-python@v5
+      - name: Build Python
+        uses: gabrielfalcao/pyenv-action@v17
         with:
-          python-version-file: '.python-version'
-          check-latest: true
-          cache: 'pip'
+          default: 3.11
+          versions: 3.7, 3.8, 3.9, 3.10, 3.11, 3.12
+          command: |
+            python -m ensurepip --upgrade
       - name: Install Nox
         run: pip install nox
       - name: Run Tests
