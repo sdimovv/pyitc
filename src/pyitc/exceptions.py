@@ -100,7 +100,7 @@ class ItcCApiError(ItcError):
     def status(self) -> ItcStatus:
         return self.args[0]
 
-class UnkownError(ItcCApiError):
+class UnknownError(ItcCApiError):
     """Unknown ITC error"""
 
     def __init__(self, status: Union[int, ItcStatus, None] = None) -> None:

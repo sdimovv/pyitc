@@ -4,7 +4,7 @@ from typing import Any, Callable, Optional, Union
 
 from cffi.backend_ctypes import CTypesData
 
-from ..exceptions import ItcCApiError, ItcStatus, UnkownError
+from ..exceptions import ItcCApiError, ItcStatus, UnknownError
 from . import _ffi, _lib
 
 
@@ -57,7 +57,10 @@ class ItcWrapper(ABC):
 
     def __del__(self) -> None:
         """Deallocate the object"""
-        del self._c_type
+        try:
+            del self._c_type
+        except AttributeError:
+            pass
 
     def __repr__(self) -> str:
         """Repr the object"""
@@ -77,12 +80,6 @@ class ItcWrapper(ABC):
         if is_handle_valid(self.__internal_c_type):
             self._del_c_type(self.__internal_c_type)
 
-    @_c_type.setter
-    def _c_type(self, c_type: CTypesData) -> None:
-        """Set the underlying CFFI cdata object"""
-        del self._c_type
-        self.__internal_c_type = c_type
-
 
 def _handle_c_return_status(status: Union[int, ItcStatus]) -> None:
     """Checks the given status an raises the appropriate :class:`ItcCApiError`"""
@@ -91,8 +88,8 @@ def _handle_c_return_status(status: Union[int, ItcStatus]) -> None:
 
     exc_candidates = [x for x in ItcCApiError.__subclasses__() if x.STATUS == status]
 
-    if not exc_candidates:
-        raise UnkownError(status)
+    if not exc_candidates: # pragma: no cover
+        raise UnknownError(status)
 
     raise exc_candidates[0]()
 
@@ -141,9 +138,9 @@ def _call_serialisation_func(
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    if initial_array_size < 1:
+    if initial_array_size < 1: # pragma: no cover
         raise ValueError("initial_array_size must be >= 1")
-    if max_array_size < 1:
+    if max_array_size < 1: # pragma: no cover
         raise ValueError("max_array_size must be >= 1")
 
     c_array_size = initial_array_size
@@ -157,7 +154,7 @@ def _call_serialisation_func(
         status = func(pp_handle[0], c_array, p_c_array_size)
         # If the call fails with insufficient resources, try again with a
         # bigger buffer
-        c_array_size *= 2
+        c_array_size = min(c_array_size * 2, max_array_size)
 
     _handle_c_return_status(status)
 
@@ -262,7 +259,7 @@ def split_id(pp_handle: CTypesData) -> CTypesData:
 
     try:
         _handle_c_return_status(_lib.ITC_Id_split(pp_handle, pp_other_handle))
-    except Exception:
+    except Exception: # pragma: no cover
         # The other handle cannot be returned. Destroy it
         if is_handle_valid(pp_other_handle):
             free_id(pp_other_handle)
@@ -538,7 +535,7 @@ def fork_stamp(pp_handle: CTypesData) -> CTypesData:
 
     try:
         _handle_c_return_status(_lib.ITC_Stamp_fork(pp_handle, pp_other_handle))
-    except Exception:
+    except Exception: # pragma: no cover
         # The other handle cannot be returned. Destroy it
         if is_handle_valid(pp_other_handle):
             free_stamp(pp_other_handle)
