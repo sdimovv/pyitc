@@ -10,9 +10,43 @@ dependencies = [
   "cffi>=1.15.1; python_version<'3.8'",
   "cffi>=1.16; python_version>='3.8'",
 ]
-optional-dependencies.test = [
+optional-dependencies.dev = [
   "pytest",
   "pytest-cov",
+  "black",
+  "isort",
+  "flake8",
+  "flake8-bugbear",
+  "flake8-builtins",
+  "flake8-warnings",
+  "flake8-copyright",
+  "flake8-pyproject",
+  "flake8-pytest-style",
+  "flake8-annotations",
+  "flake8-simplify",
+  "pydoclint",
+  "mypy",
+]
+
+[tool.isort]
+profile = "black"
+known_first_party = ["pyitc"]
+
+[tool.flake8]
+copyright-check = true
+max-line-length = 80
+max-complexity = 12
+extend-select = [
+  "B950",
+  "DOC",
+  "C",
+]
+extend-ignore = [
+  "E203",
+  "E501",
+  "E701",
+  "ANN101",
+  "ANN102",
 ]
 
 [tool.meson-python.args]
