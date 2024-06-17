@@ -1,14 +1,17 @@
-import nox
+import os
 import re
+
+import nox
+
 
 def _natural_sort(l):
     convert = lambda text: int(text) if text.isdigit() else text.lower()
-    return sorted(l,
-        key=lambda key: [convert(c) for c in re.split('([0-9]+)', key)])
+    return sorted(l, key=lambda key: [convert(c) for c in re.split("([0-9]+)", key)])
 
-with open('.python-version', 'r') as f:
-    SUPPORTED_PYTHON_VERSIONS = _natural_sort(
-        re.sub(r'[\n\s]+', ' ', f.read()).split())
+
+with open(".python-version", "r") as f:
+    SUPPORTED_PYTHON_VERSIONS = _natural_sort(re.sub(r"[\n\s]+", " ", f.read()).split())
+
 
 @nox.session(python=SUPPORTED_PYTHON_VERSIONS)
 def test(session: nox.Session) -> None:
@@ -27,6 +30,7 @@ def format(session: nox.Session) -> None:
         posargs = session.posargs
     session.run("black", *posargs)
     session.run("isort", *posargs)
+
 
 @nox.session(reuse_venv=True)
 def lint(session: nox.Session) -> None:

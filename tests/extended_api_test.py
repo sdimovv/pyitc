@@ -1,7 +1,8 @@
 import pytest
 
-from pyitc.extended_api import Id, Event
-from pyitc.exceptions import InactiveIdError, OverlappingIdIntervalError, ItcStatus
+from pyitc.exceptions import InactiveIdError, ItcStatus, OverlappingIdIntervalError
+from pyitc.extended_api import Event, Id
+
 
 def test_create_seed_id() -> None:
     """Test creating a new seed ID"""
@@ -9,17 +10,21 @@ def test_create_seed_id() -> None:
     assert str(Id(True)) == "1"
     assert str(Id(seed=True)) == "1"
 
+
 def test_create_null_id() -> None:
     """Test creating a new null ID"""
     assert str(Id(False)) == "0"
     assert str(Id(seed=False)) == "0"
 
+
 def test_no_id_temp_attributes() -> None:
     """Test temporary ID attributes have been cleaned up"""
     assert not hasattr(Id(), "_seed")
 
+
 def test_split_id() -> None:
     """Test splitting an ID"""
+
     def _do_tests(obj, obj2) -> None:
         assert isinstance(obj2, Id)
         assert id(obj) != id(obj2)
@@ -38,8 +43,10 @@ def test_split_id() -> None:
     assert str(obj) == "0"
     assert str(obj2) == "0"
 
+
 def test_sum_id() -> None:
     """Test summing an ID"""
+
     def _do_tests(obj, obj2) -> None:
         assert obj.is_valid()
         assert not obj2.is_valid()
@@ -73,6 +80,7 @@ def test_sum_id() -> None:
 
     with pytest.raises(ValueError):
         obj.sum(obj)
+
 
 def test_create_event() -> None:
     """Test creating a new Event"""

@@ -1,12 +1,14 @@
 import pytest
 
 from pyitc import Stamp
-from pyitc.extended_api import Id, Event
-from pyitc.exceptions import InactiveStampError, OverlappingIdIntervalError, ItcStatus
+from pyitc.exceptions import InactiveStampError, ItcStatus, OverlappingIdIntervalError
+from pyitc.extended_api import Event, Id
+
 
 def test_create_stamp() -> None:
     """Test creating a new Stamp"""
     assert str(Stamp()) == "{1; 0}"
+
 
 def test_create_stamp_from_id() -> None:
     """Test creating a new Stamp from Id"""
@@ -15,6 +17,7 @@ def test_create_stamp_from_id() -> None:
 
     with pytest.raises(TypeError):
         Stamp(id=Event())
+
 
 def test_create_stamp_from_event() -> None:
     """Test creating a new stamp from Event"""
@@ -25,18 +28,20 @@ def test_create_stamp_from_event() -> None:
     with pytest.raises(TypeError):
         Stamp(event=Id())
 
+
 def test_create_stamp_from_id_and_event() -> None:
     """Test creating a new stamp from ID and Event"""
-    assert str(
-        Stamp(Id(seed=False), event=Stamp().event().event_component)) == "{0; 1}"
+    assert str(Stamp(Id(seed=False), event=Stamp().event().event_component)) == "{0; 1}"
 
     with pytest.raises(TypeError):
         Stamp(id=Event(), event=Id())
+
 
 def test_no_temp_attributes() -> None:
     """Test temporary Stamp attributes have been cleaned up"""
     assert not hasattr(Stamp(), "_id")
     assert not hasattr(Stamp(), "_event")
+
 
 def test_id_component() -> None:
     """Test operations over the ID component of a Stamp"""
@@ -53,6 +58,7 @@ def test_id_component() -> None:
     with pytest.raises(TypeError):
         obj.id_component = Event()
 
+
 def test_event_component() -> None:
     """Test operations over the Event component of a Stamp"""
     obj: Stamp = Stamp()
@@ -68,6 +74,7 @@ def test_event_component() -> None:
     with pytest.raises(TypeError):
         obj.event_component = Id()
 
+
 def test_peek() -> None:
     """Test getting a peek Stamp"""
     obj: Stamp = Stamp()
@@ -75,6 +82,7 @@ def test_peek() -> None:
     assert str(peek) == "{0; 0}"
     assert peek.is_valid()
     assert id(peek._c_type) != id(obj._c_type)
+
 
 def test_fork() -> None:
     """Test forking a Stamp"""
@@ -84,6 +92,7 @@ def test_fork() -> None:
     assert obj.is_valid()
     assert str(obj2) == "{(0, 1); 0}"
     assert obj2.is_valid()
+
 
 def test_event() -> None:
     """Test inflating a Stamp"""
@@ -105,6 +114,7 @@ def test_event() -> None:
     with pytest.raises(ValueError):
         obj.event(-1)
     assert obj.is_valid()
+
 
 def test_join() -> None:
     """Test joining two Stamps together"""
@@ -143,6 +153,7 @@ def test_join() -> None:
 
     with pytest.raises(ValueError):
         obj.join(obj)
+
 
 def test_comparison() -> None:
     """Test comparing Stamps"""

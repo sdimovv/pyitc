@@ -1,4 +1,3 @@
-
 from typing import Any, Union
 
 from cffi.backend_ctypes import CTypesData as _CTypesData
@@ -54,7 +53,8 @@ class Id(_wrappers.ItcWrapper):
         if not isinstance(buffer, (bytes, bytearray)):
             raise TypeError(
                 "Expected instance of Union[bytes, bytearray], "
-                f"got buffer={type(buffer)}")
+                f"got buffer={type(buffer)}"
+            )
 
         return Id(_c_type=_wrappers.deserialise_id(bytes(buffer)))
 
@@ -97,8 +97,11 @@ class Id(_wrappers.ItcWrapper):
     def __str__(self) -> str:
         """Serialise an ID to string"""
         try:
-            return _wrappers.serialise_id_to_string(self._c_type) \
-                .decode('ascii').rstrip('\0')
+            return (
+                _wrappers.serialise_id_to_string(self._c_type)
+                .decode("ascii")
+                .rstrip("\0")
+            )
         except ItcError:
             return "???"
 
@@ -116,6 +119,7 @@ class Id(_wrappers.ItcWrapper):
         if not _wrappers.is_handle_valid(super()._c_type):
             raise InactiveIdError()
         return super()._c_type
+
 
 class Event(_wrappers.ItcWrapper):
     """The Interval Tree Clock's Event"""
@@ -158,15 +162,19 @@ class Event(_wrappers.ItcWrapper):
         if not isinstance(buffer, (bytes, bytearray)):
             raise TypeError(
                 "Expected instance of Union[bytes, bytearray], "
-                f"got buffer={type(buffer)}")
+                f"got buffer={type(buffer)}"
+            )
 
         return Event(_c_type=_wrappers.deserialise_event(bytes(buffer)))
 
     def __str__(self) -> str:
         """Serialise an Event to string"""
         try:
-            return _wrappers.serialise_event_to_string(self._c_type) \
-                .decode('ascii').rstrip('\0')
+            return (
+                _wrappers.serialise_event_to_string(self._c_type)
+                .decode("ascii")
+                .rstrip("\0")
+            )
         except ItcError:
             return "???"
 

@@ -1,12 +1,15 @@
-import pytest
 from copy import deepcopy
 
-from pyitc import Stamp
-from pyitc.extended_api import Id, Event
+import pytest
 
-@pytest.mark.parametrize('cls', [Id, Event, Stamp])
+from pyitc import Stamp
+from pyitc.extended_api import Event, Id
+
+
+@pytest.mark.parametrize("cls", [Id, Event, Stamp])
 def test_cloning_and_deepcopy(cls) -> None:
     """Test cloning and deepcopying an ITC object"""
+
     def _do_checks(obj, obj_clone) -> None:
         assert isinstance(obj_clone, cls)
         assert id(obj) != id(obj_clone)
@@ -16,12 +19,14 @@ def test_cloning_and_deepcopy(cls) -> None:
     _do_checks(obj, obj.clone())
     _do_checks(obj, deepcopy(obj))
 
-@pytest.mark.parametrize('cls', [Id, Event, Stamp])
+
+@pytest.mark.parametrize("cls", [Id, Event, Stamp])
 def test_is_valid(cls) -> None:
     """Test invoking the is_valid() method of an ITC object"""
     assert cls().is_valid()
 
-@pytest.mark.parametrize('cls', [Id, Event, Stamp])
+
+@pytest.mark.parametrize("cls", [Id, Event, Stamp])
 def test_str_and_repr(cls) -> None:
     """Test invoking the __str__ and __repr__ methods of an ITC object"""
     assert len(str(cls())) > 0
@@ -29,7 +34,8 @@ def test_str_and_repr(cls) -> None:
     assert repr_.startswith(f"<{cls.__name__} = ")
     assert repr_.endswith(f">")
 
-@pytest.mark.parametrize('cls', [Id, Event, Stamp])
+
+@pytest.mark.parametrize("cls", [Id, Event, Stamp])
 def test_serdes(cls) -> None:
     """Test serialisation and deserialisation of an ITC object"""
     obj = cls()

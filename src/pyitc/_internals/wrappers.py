@@ -10,10 +10,12 @@ from . import _ffi, _lib
 
 class StampComparisonResult(IntEnum):
     """The ITC Stamp comparison result returned from the C API"""
+
     LESS_THAN = _lib.ITC_STAMP_COMPARISON_LESS_THAN
     GREATER_THAN = _lib.ITC_STAMP_COMPARISON_GREATER_THAN
     EQUAL = _lib.ITC_STAMP_COMPARISON_EQUAL
     CONCURRENT = _lib.ITC_STAMP_COMPARISON_CONCURRENT
+
 
 class ItcWrapper(ABC):
     """The base class of an ITC ID, Event or Stamp"""
@@ -66,7 +68,7 @@ class ItcWrapper(ABC):
         """Repr the object"""
         return f"<{self.__class__.__name__} = {str(self)}>"
 
-    def __deepcopy__(self, *args: Any) -> 'ItcWrapper':
+    def __deepcopy__(self, *args: Any) -> "ItcWrapper":
         return self.clone()
 
     @property
@@ -88,10 +90,11 @@ def _handle_c_return_status(status: Union[int, ItcStatus]) -> None:
 
     exc_candidates = [x for x in ItcCApiError.__subclasses__() if x.STATUS == status]
 
-    if not exc_candidates: # pragma: no cover
+    if not exc_candidates:  # pragma: no cover
         raise UnknownError(status)
 
     raise exc_candidates[0]()
+
 
 def _new_id_pp_handle() -> CTypesData:
     """Allocate a new ITC ID handle
@@ -100,12 +103,14 @@ def _new_id_pp_handle() -> CTypesData:
     """
     return _ffi.new("ITC_Id_t **")
 
+
 def _new_event_pp_handle() -> CTypesData:
     """Allocate a new ITC Event handle
 
     This handle will be automatically freed when no longer referenced.
     """
     return _ffi.new("ITC_Event_t **")
+
 
 def _new_stamp_pp_handle() -> CTypesData:
     """Allocate a new ITC Stamp handle
@@ -114,11 +119,13 @@ def _new_stamp_pp_handle() -> CTypesData:
     """
     return _ffi.new("ITC_Stamp_t **")
 
+
 def _call_serialisation_func(
-        func: Callable[[CTypesData, CTypesData, CTypesData], int],
-        pp_handle: CTypesData,
-        initial_array_size: int = 64,
-        max_array_size: int = 4 * 1024) -> bytes:
+    func: Callable[[CTypesData, CTypesData, CTypesData], int],
+    pp_handle: CTypesData,
+    initial_array_size: int = 64,
+    max_array_size: int = 4 * 1024,
+) -> bytes:
     """Call an ITC serialisation function
 
     :param func: The function to call. It is assumed it takes the passed in
@@ -138,9 +145,9 @@ def _call_serialisation_func(
     :rtype: bytes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    if initial_array_size < 1: # pragma: no cover
+    if initial_array_size < 1:  # pragma: no cover
         raise ValueError("initial_array_size must be >= 1")
-    if max_array_size < 1: # pragma: no cover
+    if max_array_size < 1:  # pragma: no cover
         raise ValueError("max_array_size must be >= 1")
 
     c_array_size = initial_array_size
@@ -158,13 +165,14 @@ def _call_serialisation_func(
 
     _handle_c_return_status(status)
 
-    return bytes(_ffi.buffer(c_array)[:p_c_array_size[0]])
+    return bytes(_ffi.buffer(c_array)[: p_c_array_size[0]])
 
 
 def _call_deserialisation_func(
-        new_pp_handle_func: Callable[[], CTypesData],
-        func: Callable[[CTypesData, CTypesData, CTypesData], int],
-        buffer: Union[bytes, bytearray]) -> CTypesData:
+    new_pp_handle_func: Callable[[], CTypesData],
+    func: Callable[[CTypesData, CTypesData, CTypesData], int],
+    buffer: Union[bytes, bytearray],
+) -> CTypesData:
     """Call an ITC deserialisation function
 
     :param new_pp_handle_func: Method returning an uninitalised handle
@@ -185,6 +193,7 @@ def _call_deserialisation_func(
     _handle_c_return_status(func(c_buffer, c_buffer_size, pp_handle))
     return pp_handle
 
+
 def is_handle_valid(pp_handle) -> bool:
     """Validate an ID/Event/Stamp handle
 
@@ -194,6 +203,7 @@ def is_handle_valid(pp_handle) -> bool:
     :rtype: CTypesData
     """
     return pp_handle and pp_handle != _ffi.NULL and pp_handle[0] != _ffi.NULL
+
 
 def new_id(seed: bool) -> CTypesData:
     """Allocate a new ITC ID
@@ -215,6 +225,7 @@ def new_id(seed: bool) -> CTypesData:
 
     return pp_handle
 
+
 def free_id(pp_handle) -> None:
     """Free an ITC ID
 
@@ -226,6 +237,7 @@ def free_id(pp_handle) -> None:
         # Sanitise the pointers
         pp_handle[0] = _ffi.NULL
         pp_handle = _ffi.NULL
+
 
 def clone_id(pp_handle: CTypesData) -> CTypesData:
     """Clone (copy) an ITC ID
@@ -241,6 +253,7 @@ def clone_id(pp_handle: CTypesData) -> CTypesData:
     pp_cloned_handle = _new_id_pp_handle()
     _handle_c_return_status(_lib.ITC_Id_clone(pp_handle[0], pp_cloned_handle))
     return pp_cloned_handle
+
 
 def split_id(pp_handle: CTypesData) -> CTypesData:
     """Split an ITC ID into two non-overlapping (distinct) intervals
@@ -259,7 +272,7 @@ def split_id(pp_handle: CTypesData) -> CTypesData:
 
     try:
         _handle_c_return_status(_lib.ITC_Id_split(pp_handle, pp_other_handle))
-    except Exception: # pragma: no cover
+    except Exception:  # pragma: no cover
         # The other handle cannot be returned. Destroy it
         if is_handle_valid(pp_other_handle):
             free_id(pp_other_handle)
@@ -267,6 +280,7 @@ def split_id(pp_handle: CTypesData) -> CTypesData:
         raise
 
     return pp_other_handle
+
 
 def sum_id(pp_handle: CTypesData, pp_other_handle: CTypesData) -> None:
     """Sum two ITC ID intervals
@@ -283,6 +297,7 @@ def sum_id(pp_handle: CTypesData, pp_other_handle: CTypesData) -> None:
     """
     _handle_c_return_status(_lib.ITC_Id_sum(pp_handle, pp_other_handle))
 
+
 def serialise_id(pp_handle: CTypesData) -> bytes:
     """Serialise the given ITC ID
 
@@ -292,6 +307,7 @@ def serialise_id(pp_handle: CTypesData) -> bytes:
     """
     return _call_serialisation_func(_lib.ITC_SerDes_serialiseId, pp_handle)
 
+
 def serialise_id_to_string(pp_handle: CTypesData) -> bytes:
     """Serialise the given ITC ID to ASCII string
 
@@ -300,6 +316,7 @@ def serialise_id_to_string(pp_handle: CTypesData) -> bytes:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     return _call_serialisation_func(_lib.ITC_SerDes_serialiseIdToString, pp_handle)
+
 
 def deserialise_id(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deserialise an ITC ID
@@ -313,10 +330,9 @@ def deserialise_id(buffer: Union[bytes, bytearray]) -> CTypesData:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     return _call_deserialisation_func(
-        _new_id_pp_handle,
-        _lib.ITC_SerDes_deserialiseId,
-        buffer
+        _new_id_pp_handle, _lib.ITC_SerDes_deserialiseId, buffer
     )
+
 
 def is_id_valid(pp_handle: CTypesData) -> bool:
     """Check whether the given ITC ID is valid
@@ -333,6 +349,7 @@ def is_id_valid(pp_handle: CTypesData) -> bool:
 
     return is_valid
 
+
 def new_event() -> CTypesData:
     """Allocate a new ITC Event
 
@@ -346,6 +363,7 @@ def new_event() -> CTypesData:
     _handle_c_return_status(_lib.ITC_Event_new(pp_handle))
     return pp_handle
 
+
 def free_event(pp_handle) -> None:
     """Free an ITC Event
 
@@ -357,6 +375,7 @@ def free_event(pp_handle) -> None:
         # Sanitise the pointers
         pp_handle[0] = _ffi.NULL
         pp_handle = _ffi.NULL
+
 
 def clone_event(pp_handle: CTypesData) -> CTypesData:
     """Clone (copy) an ITC Event
@@ -373,6 +392,7 @@ def clone_event(pp_handle: CTypesData) -> CTypesData:
     _handle_c_return_status(_lib.ITC_Event_clone(pp_handle[0], pp_cloned_handle))
     return pp_cloned_handle
 
+
 def serialise_event(pp_handle: CTypesData) -> bytes:
     """Serialise the given ITC Event
 
@@ -382,6 +402,7 @@ def serialise_event(pp_handle: CTypesData) -> bytes:
     """
     return _call_serialisation_func(_lib.ITC_SerDes_serialiseEvent, pp_handle)
 
+
 def serialise_event_to_string(pp_handle: CTypesData) -> bytes:
     """Serialise the given ITC Event to ASCII string
 
@@ -390,9 +411,9 @@ def serialise_event_to_string(pp_handle: CTypesData) -> bytes:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     return _call_serialisation_func(
-        _lib.ITC_SerDes_serialiseEventToString,
-        pp_handle,
-        initial_array_size=128)
+        _lib.ITC_SerDes_serialiseEventToString, pp_handle, initial_array_size=128
+    )
+
 
 def deserialise_event(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deerialise an ITC Event
@@ -406,10 +427,9 @@ def deserialise_event(buffer: Union[bytes, bytearray]) -> CTypesData:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     return _call_deserialisation_func(
-        _new_event_pp_handle,
-        _lib.ITC_SerDes_deserialiseEvent,
-        buffer
+        _new_event_pp_handle, _lib.ITC_SerDes_deserialiseEvent, buffer
     )
+
 
 def is_event_valid(pp_handle: CTypesData) -> bool:
     """Check whether the given ITC Event is valid
@@ -426,6 +446,7 @@ def is_event_valid(pp_handle: CTypesData) -> bool:
 
     return is_valid
 
+
 def new_stamp() -> CTypesData:
     """Allocate a new ITC seed Stamp
 
@@ -438,6 +459,7 @@ def new_stamp() -> CTypesData:
     pp_handle = _new_stamp_pp_handle()
     _handle_c_return_status(_lib.ITC_Stamp_newSeed(pp_handle))
     return pp_handle
+
 
 def new_stamp_from_id(pp_id_handle: CTypesData) -> CTypesData:
     """Allocate a new ITC seed Stamp from an existing ID
@@ -454,7 +476,10 @@ def new_stamp_from_id(pp_id_handle: CTypesData) -> CTypesData:
     _handle_c_return_status(_lib.ITC_Stamp_newFromId(pp_id_handle[0], pp_handle))
     return pp_handle
 
-def new_stamp_from_id_and_event(pp_id_handle: CTypesData, pp_event_handle: CTypesData) -> CTypesData:
+
+def new_stamp_from_id_and_event(
+    pp_id_handle: CTypesData, pp_event_handle: CTypesData
+) -> CTypesData:
     """Allocate a new ITC seed Stamp from an existing ID and Event
 
     The Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
@@ -469,11 +494,10 @@ def new_stamp_from_id_and_event(pp_id_handle: CTypesData, pp_event_handle: CType
     """
     pp_handle = _new_stamp_pp_handle()
     _handle_c_return_status(
-        _lib.ITC_Stamp_newFromIdAndEvent(
-            pp_id_handle[0],
-            pp_event_handle[0],
-            pp_handle))
+        _lib.ITC_Stamp_newFromIdAndEvent(pp_id_handle[0], pp_event_handle[0], pp_handle)
+    )
     return pp_handle
+
 
 def new_peek_stamp(pp_src_handle: CTypesData) -> CTypesData:
     """Allocate a new ITC peek Stamp from a regular Stamp
@@ -491,6 +515,7 @@ def new_peek_stamp(pp_src_handle: CTypesData) -> CTypesData:
     _handle_c_return_status(_lib.ITC_Stamp_newPeek(pp_src_handle[0], pp_handle))
     return pp_handle
 
+
 def free_stamp(pp_handle) -> None:
     """Free an ITC Stamp
 
@@ -502,6 +527,7 @@ def free_stamp(pp_handle) -> None:
         # Sanitise the pointers
         pp_handle[0] = _ffi.NULL
         pp_handle = _ffi.NULL
+
 
 def clone_stamp(pp_handle: CTypesData) -> CTypesData:
     """Clone (copy) an ITC Stamp
@@ -517,6 +543,7 @@ def clone_stamp(pp_handle: CTypesData) -> CTypesData:
     pp_cloned_handle = _new_stamp_pp_handle()
     _handle_c_return_status(_lib.ITC_Stamp_clone(pp_handle[0], pp_cloned_handle))
     return pp_cloned_handle
+
 
 def fork_stamp(pp_handle: CTypesData) -> CTypesData:
     """Fork (split) an ITC Stamp into two non-overlapping (distinct) intervals
@@ -535,7 +562,7 @@ def fork_stamp(pp_handle: CTypesData) -> CTypesData:
 
     try:
         _handle_c_return_status(_lib.ITC_Stamp_fork(pp_handle, pp_other_handle))
-    except Exception: # pragma: no cover
+    except Exception:  # pragma: no cover
         # The other handle cannot be returned. Destroy it
         if is_handle_valid(pp_other_handle):
             free_stamp(pp_other_handle)
@@ -543,6 +570,7 @@ def fork_stamp(pp_handle: CTypesData) -> CTypesData:
         raise
 
     return pp_other_handle
+
 
 def inflate_stamp(pp_handle: CTypesData) -> None:
     """Add an Event (inflate) the given ITC Stamp
@@ -552,6 +580,7 @@ def inflate_stamp(pp_handle: CTypesData) -> None:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     _handle_c_return_status(_lib.ITC_Stamp_event(pp_handle[0]))
+
 
 def join_stamp(pp_handle: CTypesData, pp_other_handle: CTypesData) -> None:
     """Join two ITC Stamp, merging their ID intervals and causal history
@@ -568,7 +597,10 @@ def join_stamp(pp_handle: CTypesData, pp_other_handle: CTypesData) -> None:
     """
     _handle_c_return_status(_lib.ITC_Stamp_join(pp_handle, pp_other_handle))
 
-def compare_stamps(pp_handle: CTypesData, pp_other_handle: CTypesData) -> StampComparisonResult:
+
+def compare_stamps(
+    pp_handle: CTypesData, pp_other_handle: CTypesData
+) -> StampComparisonResult:
     """Compare two Stamps
 
     :param pp_handle: The handle of the first source Stamp
@@ -584,14 +616,11 @@ def compare_stamps(pp_handle: CTypesData, pp_other_handle: CTypesData) -> StampC
     p_comparison_result = _ffi.new("ITC_Stamp_Comparison_t *")
 
     _handle_c_return_status(
-        _lib.ITC_Stamp_compare(
-            pp_handle[0],
-            pp_other_handle[0],
-            p_comparison_result
-        )
+        _lib.ITC_Stamp_compare(pp_handle[0], pp_other_handle[0], p_comparison_result)
     )
 
     return StampComparisonResult(p_comparison_result[0])
+
 
 def serialise_stamp(pp_handle: CTypesData) -> bytes:
     """Serialise the given ITC Stamp
@@ -601,9 +630,10 @@ def serialise_stamp(pp_handle: CTypesData) -> bytes:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     return _call_serialisation_func(
-         _lib.ITC_SerDes_serialiseStamp,
-         pp_handle,
+        _lib.ITC_SerDes_serialiseStamp,
+        pp_handle,
     )
+
 
 def serialise_stamp_to_string(pp_handle: CTypesData) -> bytes:
     """Serialise the given ITC Stamp to ASCII string
@@ -613,10 +643,9 @@ def serialise_stamp_to_string(pp_handle: CTypesData) -> bytes:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     return _call_serialisation_func(
-        _lib.ITC_SerDes_serialiseStampToString,
-        pp_handle,
-        initial_array_size=128
+        _lib.ITC_SerDes_serialiseStampToString, pp_handle, initial_array_size=128
     )
+
 
 def deserialise_stamp(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deserialise an ITC Stamp
@@ -630,10 +659,9 @@ def deserialise_stamp(buffer: Union[bytes, bytearray]) -> CTypesData:
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     return _call_deserialisation_func(
-        _new_stamp_pp_handle,
-        _lib.ITC_SerDes_deserialiseStamp,
-        buffer
+        _new_stamp_pp_handle, _lib.ITC_SerDes_deserialiseStamp, buffer
     )
+
 
 def is_stamp_valid(pp_handle: CTypesData) -> bool:
     """Check whether the given ITC Stamp is valid
@@ -650,6 +678,7 @@ def is_stamp_valid(pp_handle: CTypesData) -> bool:
 
     return is_valid
 
+
 def get_id_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
     """Get a copy of the ID component of a Stamp
 
@@ -663,7 +692,10 @@ def get_id_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
     _handle_c_return_status(_lib.ITC_Stamp_getId(pp_handle[0], pp_id_handle))
     return pp_id_handle
 
-def set_id_copmponent_of_stamp(pp_stamp_handle: CTypesData, pp_id_handle: CTypesData) -> CTypesData:
+
+def set_id_copmponent_of_stamp(
+    pp_stamp_handle: CTypesData, pp_id_handle: CTypesData
+) -> CTypesData:
     """Set the ID component of a Stamp
 
 
@@ -675,6 +707,7 @@ def set_id_copmponent_of_stamp(pp_stamp_handle: CTypesData, pp_id_handle: CTypes
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
     _handle_c_return_status(_lib.ITC_Stamp_setId(pp_stamp_handle[0], pp_id_handle[0]))
+
 
 def get_event_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
     """Get a copy of the Event component of a Stamp
@@ -689,7 +722,10 @@ def get_event_component_of_stamp(pp_handle: CTypesData) -> CTypesData:
     _handle_c_return_status(_lib.ITC_Stamp_getEvent(pp_handle[0], pp_event_handle))
     return pp_event_handle
 
-def set_event_copmponent_of_stamp(pp_stamp_handle: CTypesData, pp_event_handle: CTypesData) -> CTypesData:
+
+def set_event_copmponent_of_stamp(
+    pp_stamp_handle: CTypesData, pp_event_handle: CTypesData
+) -> CTypesData:
     """Set the Event component of a Stamp
 
 
@@ -700,4 +736,6 @@ def set_event_copmponent_of_stamp(pp_stamp_handle: CTypesData, pp_event_handle: 
     :type pp_event_handle: CTypesData
     :raises ItcCApiError: If something goes wrong while inside the C API
     """
-    _handle_c_return_status(_lib.ITC_Stamp_setEvent(pp_stamp_handle[0], pp_event_handle[0]))
+    _handle_c_return_status(
+        _lib.ITC_Stamp_setEvent(pp_stamp_handle[0], pp_event_handle[0])
+    )

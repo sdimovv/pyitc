@@ -25,13 +25,15 @@ with open(header_definitions_file) as f:
     contents = f.read()
     # Sanitize the output due to `pycparser` limitations
     # Remove defines not starting with `ITC_`
-    contents = re.sub(r"^(?!#define\s+ITC).*\n", '', contents, flags=re.MULTILINE)
+    contents = re.sub(r"^(?!#define\s+ITC).*\n", "", contents, flags=re.MULTILINE)
     # Remove defines without value (i.e. `#define SOMETHING`)
-    contents = re.sub(r"^#define\s+\w+\s*\n", '', contents, flags=re.MULTILINE)
+    contents = re.sub(r"^#define\s+\w+\s*\n", "", contents, flags=re.MULTILINE)
     # Remove suffixes from integer literals (`1U` -> `1`, `0xAFuLL` -> `0xAF`)
-    contents = re.sub(r"(\b(?:0[xXbB])?[\da-fA-F]+)[UulL]+\b", r'\1', contents, flags=re.MULTILINE)
+    contents = re.sub(
+        r"(\b(?:0[xXbB])?[\da-fA-F]+)[UulL]+\b", r"\1", contents, flags=re.MULTILINE
+    )
     # Remove brackets
-    contents = re.sub(r"[\(\)]", '', contents, flags=re.MULTILINE)
+    contents = re.sub(r"[\(\)]", "", contents, flags=re.MULTILINE)
 
     ffibuilder.cdef(contents)
 
@@ -40,5 +42,5 @@ ffibuilder.set_source(
     '#include "ITC.h"',
 )
 
-if __name__ == '__main__':
-    ffibuilder.distutils_extension('.')
+if __name__ == "__main__":
+    ffibuilder.distutils_extension(".")

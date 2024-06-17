@@ -11,17 +11,16 @@ class Stamp(_wrappers.ItcWrapper):
     """The Interval Tree Clock's Stamp"""
 
     def __init__(
-            self,
-            id: Optional[extended_api.Id] = None,
-            event: Optional[extended_api.Event] = None,
-            **kwargs: Any) -> None:
+        self,
+        id: Optional[extended_api.Id] = None,
+        event: Optional[extended_api.Event] = None,
+        **kwargs: Any,
+    ) -> None:
         """Create a new Stamp"""
         if id and not isinstance(id, extended_api.Id):
-            raise TypeError(
-                f"Expected instance of Id, got id={type(id)}")
+            raise TypeError(f"Expected instance of Id, got id={type(id)}")
         if event and not isinstance(event, extended_api.Event):
-            raise TypeError(
-                f"Expected instance of Event, got event={type(event)}")
+            raise TypeError(f"Expected instance of Event, got event={type(event)}")
 
         self._id = id
         self._event = event
@@ -67,7 +66,8 @@ class Stamp(_wrappers.ItcWrapper):
         if not isinstance(buffer, (bytes, bytearray)):
             raise TypeError(
                 "Expected instance of Union[bytes, bytearray], "
-                f"got buffer={type(buffer)}")
+                f"got buffer={type(buffer)}"
+            )
 
         return Stamp(_c_type=_wrappers.deserialise_stamp(bytes(buffer)))
 
@@ -75,7 +75,8 @@ class Stamp(_wrappers.ItcWrapper):
     def id_component(self) -> extended_api.Id:
         """Get a copy of the ID component"""
         return extended_api.Id(
-            _c_type=_wrappers.get_id_component_of_stamp(self._c_type))
+            _c_type=_wrappers.get_id_component_of_stamp(self._c_type)
+        )
 
     @id_component.setter
     def id_component(self, id: extended_api.Id) -> None:
@@ -89,14 +90,14 @@ class Stamp(_wrappers.ItcWrapper):
     def event_component(self) -> extended_api.Event:
         """Get a copy of the Event component"""
         return extended_api.Event(
-            _c_type=_wrappers.get_event_component_of_stamp(self._c_type))
+            _c_type=_wrappers.get_event_component_of_stamp(self._c_type)
+        )
 
     @event_component.setter
     def event_component(self, event: extended_api.Event) -> None:
         """Replace the Event component of the Stamp with a copy of the input Event"""
         if not isinstance(event, extended_api.Event):
-            raise TypeError(
-                f"Expected instance of Event, got event={type(event)}")
+            raise TypeError(f"Expected instance of Event, got event={type(event)}")
 
         _wrappers.set_event_copmponent_of_stamp(self._c_type, event._c_type)
 
@@ -152,8 +153,7 @@ class Stamp(_wrappers.ItcWrapper):
         """
         for stamp in other_stamp:
             if not isinstance(stamp, Stamp):
-                raise TypeError(
-                    f"Expected instance of Stamp, got stamp={type(stamp)}")
+                raise TypeError(f"Expected instance of Stamp, got stamp={type(stamp)}")
             if self._c_type == stamp._c_type:
                 raise ValueError("A Stamp cannot be joined with itself")
 
@@ -165,82 +165,91 @@ class Stamp(_wrappers.ItcWrapper):
     def __str__(self) -> str:
         """Serialise a Stamp to string"""
         try:
-            return _wrappers.serialise_stamp_to_string(self._c_type) \
-                .decode('ascii').rstrip('\0')
+            return (
+                _wrappers.serialise_stamp_to_string(self._c_type)
+                .decode("ascii")
+                .rstrip("\0")
+            )
         except ItcError:
             return "???"
 
     def __lt__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp): # pragma: no cover
+        if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
         return (
-            _wrappers.compare_stamps(self._c_type, other._c_type) ==
-                _wrappers.StampComparisonResult.LESS_THAN
+            _wrappers.compare_stamps(self._c_type, other._c_type)
+            == _wrappers.StampComparisonResult.LESS_THAN
         )
 
     def __le__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp): # pragma: no cover
+        if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
         return bool(
-            _wrappers.compare_stamps(self._c_type, other._c_type) &
-                (_wrappers.StampComparisonResult.LESS_THAN |
-                 _wrappers.StampComparisonResult.EQUAL)
+            _wrappers.compare_stamps(self._c_type, other._c_type)
+            & (
+                _wrappers.StampComparisonResult.LESS_THAN
+                | _wrappers.StampComparisonResult.EQUAL
+            )
         )
 
     def __gt__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp): # pragma: no cover
+        if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
         return (
-            _wrappers.compare_stamps(self._c_type, other._c_type) ==
-                _wrappers.StampComparisonResult.GREATER_THAN
+            _wrappers.compare_stamps(self._c_type, other._c_type)
+            == _wrappers.StampComparisonResult.GREATER_THAN
         )
 
     def __ge__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp): # pragma: no cover
+        if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
         return bool(
-            _wrappers.compare_stamps(self._c_type, other._c_type) &
-                (_wrappers.StampComparisonResult.GREATER_THAN |
-                 _wrappers.StampComparisonResult.EQUAL)
+            _wrappers.compare_stamps(self._c_type, other._c_type)
+            & (
+                _wrappers.StampComparisonResult.GREATER_THAN
+                | _wrappers.StampComparisonResult.EQUAL
+            )
         )
 
     def __eq__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp): # pragma: no cover
+        if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
         return (
-            _wrappers.compare_stamps(self._c_type, other._c_type) ==
-                _wrappers.StampComparisonResult.EQUAL
+            _wrappers.compare_stamps(self._c_type, other._c_type)
+            == _wrappers.StampComparisonResult.EQUAL
         )
 
     def __ne__(self, other: "Stamp") -> bool:
-        if not isinstance(other, Stamp): # pragma: no cover
+        if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
         return bool(
-            _wrappers.compare_stamps(self._c_type, other._c_type) &
-                (_wrappers.StampComparisonResult.CONCURRENT |
-                  _wrappers.StampComparisonResult.LESS_THAN |
-                  _wrappers.StampComparisonResult.GREATER_THAN)
+            _wrappers.compare_stamps(self._c_type, other._c_type)
+            & (
+                _wrappers.StampComparisonResult.CONCURRENT
+                | _wrappers.StampComparisonResult.LESS_THAN
+                | _wrappers.StampComparisonResult.GREATER_THAN
+            )
         )
 
     def _new_c_type(self) -> _CTypesData:
         """Create a new ITC Stamp. Only used during initialisation"""
         if self._id and self._event:
             return _wrappers.new_stamp_from_id_and_event(
-                self._id._c_type, self._event._c_type)
+                self._id._c_type, self._event._c_type
+            )
 
         if self._id:
             return _wrappers.new_stamp_from_id(self._id._c_type)
 
         if self._event:
             id = _wrappers.new_id(seed=True)
-            stamp = _wrappers.new_stamp_from_id_and_event(
-                id, self._event._c_type)
+            stamp = _wrappers.new_stamp_from_id_and_event(id, self._event._c_type)
             _wrappers.free_id(id)
             return stamp
 
