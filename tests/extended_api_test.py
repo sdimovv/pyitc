@@ -1,3 +1,6 @@
+# Copyright (c) 2024 pyitc project. Released under AGPL-3.0
+# license. Refer to the LICENSE file for details or visit:
+# https://www.gnu.org/licenses/agpl-3.0.en.html
 import pytest
 
 from pyitc.exceptions import InactiveIdError, ItcStatus, OverlappingIdIntervalError
@@ -25,7 +28,7 @@ def test_no_id_temp_attributes() -> None:
 def test_split_id() -> None:
     """Test splitting an ID"""
 
-    def _do_tests(obj, obj2) -> None:
+    def _do_tests(obj, obj2) -> None:  # noqa: ANN001
         assert isinstance(obj2, Id)
         assert id(obj) != id(obj2)
         assert obj.is_valid()
@@ -47,7 +50,7 @@ def test_split_id() -> None:
 def test_sum_id() -> None:
     """Test summing an ID"""
 
-    def _do_tests(obj, obj2) -> None:
+    def _do_tests(obj, obj2) -> None:  # noqa: ANN001
         assert obj.is_valid()
         assert not obj2.is_valid()
         with pytest.raises(InactiveIdError):
@@ -75,10 +78,12 @@ def test_sum_id() -> None:
         obj.sum(Id(seed=True))
     assert exc_info.value.status == ItcStatus.OVERLAPPING_ID_INTERVAL
 
-    with pytest.raises(TypeError):
+    with pytest.raises(
+        TypeError, match=r"Expected instance of Id, got id=<class '.*\.Event'>"
+    ):
         obj.sum(Event())
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"An Id cannot be summed with itself"):
         obj.sum(obj)
 
 

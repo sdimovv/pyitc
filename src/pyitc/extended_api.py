@@ -1,3 +1,6 @@
+# Copyright (c) 2024 pyitc project. Released under AGPL-3.0
+# license. Refer to the LICENSE file for details or visit:
+# https://www.gnu.org/licenses/agpl-3.0.en.html
 from typing import Any, Union
 
 from cffi.backend_ctypes import CTypesData as _CTypesData
@@ -10,7 +13,6 @@ class Id(_wrappers.ItcWrapper):
     """The Interval Tree Clock's ID"""
 
     def __init__(self, seed: bool = True, **kwargs: Any) -> None:
-        """Create a new ID"""
         self._seed = seed
         super().__init__(**kwargs)
         del self._seed
@@ -69,7 +71,7 @@ class Id(_wrappers.ItcWrapper):
         """
         return Id(_c_type=_wrappers.split_id(self._c_type))
 
-    def sum(self, *other_id: "Id") -> "Id":
+    def sum(self, *other_id: "Id") -> "Id":  # noqa: A003
         """Sum ID interval(s)
 
         After the sumation, this ID becomes the owner of the summed interval(s),
@@ -83,14 +85,14 @@ class Id(_wrappers.ItcWrapper):
         :raises ValueError: If both IDs are of the same instance
         :raises ItcError: If something goes wrong during the sumation
         """
-        for id in other_id:
-            if not isinstance(id, Id):
-                raise TypeError(f"Expected instance of Id, got id={type(id)}")
-            if self._c_type == id._c_type:
+        for id_ in other_id:
+            if not isinstance(id_, Id):
+                raise TypeError(f"Expected instance of Id, got id={type(id_)}")
+            if self._c_type == id_._c_type:
                 raise ValueError("An Id cannot be summed with itself")
 
-        for id in other_id:
-            _wrappers.sum_id(self._c_type, id._c_type)
+        for id_ in other_id:
+            _wrappers.sum_id(self._c_type, id_._c_type)
 
         return self
 

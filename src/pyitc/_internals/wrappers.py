@@ -1,4 +1,8 @@
+# Copyright (c) 2024 pyitc project. Released under AGPL-3.0
+# license. Refer to the LICENSE file for details or visit:
+# https://www.gnu.org/licenses/agpl-3.0.en.html
 from abc import ABC, abstractmethod
+from contextlib import suppress
 from enum import IntEnum
 from typing import Any, Callable, Optional, Union
 
@@ -50,7 +54,6 @@ class ItcWrapper(ABC):
         """Free the ITC/Event/Stamp stored in `self._c_type`"""
 
     def __init__(self, _c_type: Optional[CTypesData] = None) -> None:
-        """Initialise a new ITC ID/Event/Stamp"""
         super().__init__()
         if _c_type:
             self.__internal_c_type = _c_type
@@ -59,10 +62,8 @@ class ItcWrapper(ABC):
 
     def __del__(self) -> None:
         """Deallocate the object"""
-        try:
+        with suppress(AttributeError):
             del self._c_type
-        except AttributeError:
-            pass
 
     def __repr__(self) -> str:
         """Repr the object"""
@@ -194,7 +195,7 @@ def _call_deserialisation_func(
     return pp_handle
 
 
-def is_handle_valid(pp_handle) -> bool:
+def is_handle_valid(pp_handle: CTypesData) -> bool:
     """Validate an ID/Event/Stamp handle
 
     :param pp_handle: The handle to validate
@@ -226,7 +227,7 @@ def new_id(seed: bool) -> CTypesData:
     return pp_handle
 
 
-def free_id(pp_handle) -> None:
+def free_id(pp_handle: CTypesData) -> None:
     """Free an ITC ID
 
     :raises ItcCApiError: If something goes wrong while inside the C API
@@ -364,7 +365,7 @@ def new_event() -> CTypesData:
     return pp_handle
 
 
-def free_event(pp_handle) -> None:
+def free_event(pp_handle: CTypesData) -> None:
     """Free an ITC Event
 
     :raises ItcCApiError: If something goes wrong while inside the C API
@@ -516,7 +517,7 @@ def new_peek_stamp(pp_src_handle: CTypesData) -> CTypesData:
     return pp_handle
 
 
-def free_stamp(pp_handle) -> None:
+def free_stamp(pp_handle: CTypesData) -> None:
     """Free an ITC Stamp
 
     :raises ItcCApiError: If something goes wrong while inside the C API
@@ -650,7 +651,8 @@ def serialise_stamp_to_string(pp_handle: CTypesData) -> bytes:
 def deserialise_stamp(buffer: Union[bytes, bytearray]) -> CTypesData:
     """Deserialise an ITC Stamp
 
-    The deserialised Stamp must be deallocated with :meth:`free_stamp` when no longer needed.
+    The deserialised Stamp must be deallocated with :meth:`free_stamp` when
+    no longer needed.
 
     :param buffer: The buffer containing the serialised Stamp
     :type buffer: Union[bytes, bytearray]

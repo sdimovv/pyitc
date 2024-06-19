@@ -1,3 +1,6 @@
+# Copyright (c) 2024 pyitc project. Released under AGPL-3.0
+# license. Refer to the LICENSE file for details or visit:
+# https://www.gnu.org/licenses/agpl-3.0.en.html
 from enum import Enum
 from typing import Union
 
@@ -47,7 +50,10 @@ class ItcStatus(int, Enum):
     )
     INCOMPATIBLE_LIB_VERSION = (
         _lib.ITC_STATUS_SERDES_INCOMPATIBLE_LIB_VERSION,
-        "Operation failed due to the serialised ITC data being from an older or newer libitc version",
+        (
+            "Operation failed due to the serialised ITC data being "
+            "from an older or newer libitc version"
+        ),
     )
 
     UNKNOWN = (-1, "Unknown status")
@@ -193,6 +199,6 @@ class UnsupportedEventCounterSizeError(ItcCApiError):
 
 
 class IncompatibleLibVersionError(ItcCApiError):
-    """Operation failed due to the serialised ITC data being from an older or newer libitc version"""
+    """Operation failed due to the serialised ITC data being from an older or newer libitc version"""  # noqa: B950
 
     STATUS: ItcStatus = ItcStatus.INCOMPATIBLE_LIB_VERSION

@@ -1,12 +1,18 @@
+# Copyright (c) 2024 pyitc project. Released under AGPL-3.0
+# license. Refer to the LICENSE file for details or visit:
+# https://www.gnu.org/licenses/agpl-3.0.en.html
 import os
 import re
+from typing import List
 
 import nox
 
 
-def _natural_sort(l):
-    convert = lambda text: int(text) if text.isdigit() else text.lower()
-    return sorted(l, key=lambda key: [convert(c) for c in re.split("([0-9]+)", key)])
+def _natural_sort(content: str) -> List[str]:
+    convert = lambda text: int(text) if text.isdigit() else text.lower()  # noqa: E731
+    return sorted(
+        content, key=lambda key: [convert(c) for c in re.split("([0-9]+)", key)]
+    )
 
 
 with open(".python-version", "r") as f:
@@ -16,14 +22,14 @@ with open(".python-version", "r") as f:
 @nox.session(python=SUPPORTED_PYTHON_VERSIONS)
 def test(session: nox.Session) -> None:
     """Run the tests."""
-    session.install(".[dev]")
+    session.install(".[test]")
     session.run("pytest", "--cov=pyitc", *session.posargs)
 
 
 @nox.session(reuse_venv=True)
-def format(session: nox.Session) -> None:
+def format(session: nox.Session) -> None:  # noqa: A001
     """Format the code."""
-    session.install(".[dev]")
+    session.install(".[qa]")
     if not session.posargs:
         posargs = [os.path.dirname(os.path.realpath(__file__))]
     else:
@@ -35,7 +41,7 @@ def format(session: nox.Session) -> None:
 @nox.session(reuse_venv=True)
 def lint(session: nox.Session) -> None:
     """Lint the code."""
-    session.install(".[dev]")
+    session.install(".[qa]")
     if not session.posargs:
         posargs = [os.path.dirname(os.path.realpath(__file__))]
     else:

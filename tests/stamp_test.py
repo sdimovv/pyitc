@@ -1,3 +1,6 @@
+# Copyright (c) 2024 pyitc project. Released under AGPL-3.0
+# license. Refer to the LICENSE file for details or visit:
+# https://www.gnu.org/licenses/agpl-3.0.en.html
 import pytest
 
 from pyitc import Stamp
@@ -109,9 +112,9 @@ def test_event() -> None:
     assert str(obj) == "{1; 12}"
     assert obj.is_valid()
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Count must be >= 1"):
         obj.event(0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"Count must be >= 1"):
         obj.event(-1)
     assert obj.is_valid()
 
@@ -148,10 +151,12 @@ def test_join() -> None:
         obj.join(Stamp())
     assert exc_info.value.status == ItcStatus.OVERLAPPING_ID_INTERVAL
 
-    with pytest.raises(TypeError):
+    with pytest.raises(
+        TypeError, match=r"Expected instance of Stamp, got stamp=<class '.*\.Event'>"
+    ):
         obj.join(Event())
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"A Stamp cannot be joined with itself"):
         obj.join(obj)
 
 
@@ -167,7 +172,7 @@ def test_comparison() -> None:
     assert obj2 >= obj
     assert obj != obj2
     obj.event()
-    assert not obj == obj2
+    assert not obj == obj2  # noqa: SIM201
     assert not obj <= obj2
     assert not obj >= obj2
     assert not obj > obj2

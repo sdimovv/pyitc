@@ -10,9 +10,11 @@ dependencies = [
   "cffi>=1.15.1; python_version<'3.8'",
   "cffi>=1.16; python_version>='3.8'",
 ]
-optional-dependencies.dev = [
+optional-dependencies.test = [
   "pytest",
   "pytest-cov",
+]
+optional-dependencies.qa = [
   "black",
   "isort",
   "flake8",

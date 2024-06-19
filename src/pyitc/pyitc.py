@@ -1,3 +1,6 @@
+# Copyright (c) 2024 pyitc project. Released under AGPL-3.0
+# license. Refer to the LICENSE file for details or visit:
+# https://www.gnu.org/licenses/agpl-3.0.en.html
 from typing import Any, Optional, Union
 
 from cffi.backend_ctypes import CTypesData as _CTypesData
@@ -12,11 +15,10 @@ class Stamp(_wrappers.ItcWrapper):
 
     def __init__(
         self,
-        id: Optional[extended_api.Id] = None,
+        id: Optional[extended_api.Id] = None,  # noqa: A002
         event: Optional[extended_api.Event] = None,
         **kwargs: Any,
     ) -> None:
-        """Create a new Stamp"""
         if id and not isinstance(id, extended_api.Id):
             raise TypeError(f"Expected instance of Id, got id={type(id)}")
         if event and not isinstance(event, extended_api.Event):
@@ -79,12 +81,12 @@ class Stamp(_wrappers.ItcWrapper):
         )
 
     @id_component.setter
-    def id_component(self, id: extended_api.Id) -> None:
+    def id_component(self, id_: extended_api.Id) -> None:
         """Replace the ID component of the Stamp with a copy of the input Id"""
-        if not isinstance(id, extended_api.Id):
-            raise TypeError(f"Expected instance of Id, got id={type(id)}")
+        if not isinstance(id_, extended_api.Id):
+            raise TypeError(f"Expected instance of Id, got id={type(id_)}")
 
-        _wrappers.set_id_copmponent_of_stamp(self._c_type, id._c_type)
+        _wrappers.set_id_copmponent_of_stamp(self._c_type, id_._c_type)
 
     @property
     def event_component(self) -> extended_api.Event:
@@ -130,7 +132,7 @@ class Stamp(_wrappers.ItcWrapper):
         :raises ItcError: If something goes wrong during the inflation
         """
         if count < 1:
-            raise ValueError("count must be >= 1")
+            raise ValueError("Count must be >= 1")
 
         for _ in range(count):
             _wrappers.inflate_stamp(self._c_type)
@@ -248,9 +250,9 @@ class Stamp(_wrappers.ItcWrapper):
             return _wrappers.new_stamp_from_id(self._id._c_type)
 
         if self._event:
-            id = _wrappers.new_id(seed=True)
-            stamp = _wrappers.new_stamp_from_id_and_event(id, self._event._c_type)
-            _wrappers.free_id(id)
+            id_ = _wrappers.new_id(seed=True)
+            stamp = _wrappers.new_stamp_from_id_and_event(id_, self._event._c_type)
+            _wrappers.free_id(id_)
             return stamp
 
         return _wrappers.new_stamp()
