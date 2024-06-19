@@ -30,21 +30,22 @@ def test(session: nox.Session) -> None:
 def format(session: nox.Session) -> None:  # noqa: A001
     """Format the code."""
     session.install(".[qa]")
-    if not session.posargs:
-        posargs = [os.path.dirname(os.path.realpath(__file__))]
-    else:
-        posargs = session.posargs
-    session.run("black", *posargs)
-    session.run("isort", *posargs)
+    session.run("ruff", "format", *session.posargs)
 
 
 @nox.session(reuse_venv=True)
 def lint(session: nox.Session) -> None:
     """Lint the code."""
     session.install(".[qa]")
+    session.run("ruff", "check", *session.posargs)
+
+
+@nox.session(reuse_venv=True, name="typeCheck")
+def type_check(session: nox.Session) -> None:
+    """Type check the code with mypy."""
+    session.install(".[qa]")
     if not session.posargs:
         posargs = [os.path.dirname(os.path.realpath(__file__))]
     else:
         posargs = session.posargs
-    session.run("flake8", *posargs)
     session.run("mypy", *posargs)

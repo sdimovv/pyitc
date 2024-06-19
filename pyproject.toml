@@ -15,18 +15,7 @@ optional-dependencies.test = [
   "pytest-cov",
 ]
 optional-dependencies.qa = [
-  "black",
-  "isort",
-  "flake8",
-  "flake8-bugbear",
-  "flake8-builtins",
-  "flake8-warnings",
-  "flake8-copyright",
-  "flake8-pyproject",
-  "flake8-pytest-style",
-  "flake8-annotations",
-  "flake8-simplify",
-  "pydoclint",
+  "ruff",
   "mypy",
 ]
 
