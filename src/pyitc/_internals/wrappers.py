@@ -19,7 +19,7 @@ if version_info < (3, 11):
 else:
     from typing import Self
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from cffi.backend_ctypes import CTypesData  # type: ignore[import-untyped]
 
 
