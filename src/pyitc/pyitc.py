@@ -1,28 +1,44 @@
 # Copyright (c) 2024 pyitc project. Released under AGPL-3.0
 # license. Refer to the LICENSE file for details or visit:
 # https://www.gnu.org/licenses/agpl-3.0.en.html
-from typing import Any, Optional, Union
+"""The main ITC implementation."""
 
-from cffi.backend_ctypes import CTypesData as _CTypesData
+from __future__ import annotations
+
+from sys import version_info
+from typing import TYPE_CHECKING, Any
 
 from . import extended_api
 from ._internals import wrappers as _wrappers
 from .exceptions import InactiveStampError, ItcError
 
+if version_info < (3, 11):
+    from typing_extensions import Self
+else:
+    from typing import Self
+
+if TYPE_CHECKING:
+    from cffi.backend_ctypes import (  # type: ignore[import-untyped]
+        CTypesData as _CTypesData,
+    )
+
 
 class Stamp(_wrappers.ItcWrapper):
-    """The Interval Tree Clock's Stamp"""
+    """The Interval Tree Clock's Stamp."""
 
     def __init__(
-        self,
-        id: Optional[extended_api.Id] = None,  # noqa: A002
-        event: Optional[extended_api.Event] = None,
-        **kwargs: Any,
+        self: Self,
+        id: extended_api.Id | None = None,  # noqa: A002
+        event: extended_api.Event | None = None,
+        **kwargs: Any,  # noqa: ANN401
     ) -> None:
+        """Initialise a Stamp, optionally with a custom Id and/or Event trees."""
         if id and not isinstance(id, extended_api.Id):
-            raise TypeError(f"Expected instance of Id, got id={type(id)}")
+            msg = f"Expected instance of Id, got id={type(id)}"
+            raise TypeError(msg)
         if event and not isinstance(event, extended_api.Event):
-            raise TypeError(f"Expected instance of Event, got event={type(event)}")
+            msg = f"Expected instance of Event, got event={type(event)}"
+            raise TypeError(msg)
 
         self._id = id
         self._event = event
@@ -30,15 +46,15 @@ class Stamp(_wrappers.ItcWrapper):
         del self._id
         del self._event
 
-    def is_valid(self) -> bool:
-        """Validate the Stamp"""
+    def is_valid(self: Self) -> bool:
+        """Validate the Stamp."""
         try:
             return _wrappers.is_stamp_valid(self._c_type)
         except InactiveStampError:
             return False
 
-    def clone(self) -> "Stamp":
-        """Clone the Stamp
+    def clone(self: Self) -> Stamp:
+        """Clone the Stamp.
 
         :returns: The cloned Stamp
         :rtype: Stamp
@@ -46,8 +62,8 @@ class Stamp(_wrappers.ItcWrapper):
         """
         return Stamp(_c_type=_wrappers.clone_stamp(self._c_type))
 
-    def serialise(self) -> bytes:
-        """Serialise the Stamp
+    def serialise(self: Self) -> bytes:
+        """Serialise the Stamp.
 
         :returns: A buffer with the serialised Stamp in it.
         :rtype: bytes
@@ -56,8 +72,8 @@ class Stamp(_wrappers.ItcWrapper):
         return _wrappers.serialise_stamp(self._c_type)
 
     @classmethod
-    def deserialise(cls, buffer: Union[bytes, bytearray]) -> "Stamp":
-        """Deserialise an Stamp
+    def deserialise(cls: type[Self], buffer: bytes | bytearray) -> Stamp:
+        """Deserialise an Stamp.
 
         :param buffer: The buffer containing the serialised Stamp
         :type buffer: Union[bytes, bytearray]
@@ -66,45 +82,48 @@ class Stamp(_wrappers.ItcWrapper):
         :raises ItcError: If something goes wrong during the deserialisation
         """
         if not isinstance(buffer, (bytes, bytearray)):
-            raise TypeError(
+            msg = (
                 "Expected instance of Union[bytes, bytearray], "
                 f"got buffer={type(buffer)}"
             )
+            raise TypeError(msg)
 
         return Stamp(_c_type=_wrappers.deserialise_stamp(bytes(buffer)))
 
     @property
-    def id_component(self) -> extended_api.Id:
-        """Get a copy of the ID component"""
+    def id_component(self: Self) -> extended_api.Id:
+        """Get a copy of the ID component."""
         return extended_api.Id(
             _c_type=_wrappers.get_id_component_of_stamp(self._c_type)
         )
 
     @id_component.setter
-    def id_component(self, id_: extended_api.Id) -> None:
-        """Replace the ID component of the Stamp with a copy of the input Id"""
+    def id_component(self: Self, id_: extended_api.Id) -> None:
+        """Replace the ID component of the Stamp with a copy of the input Id."""
         if not isinstance(id_, extended_api.Id):
-            raise TypeError(f"Expected instance of Id, got id={type(id_)}")
+            msg = f"Expected instance of Id, got id={type(id_)}"
+            raise TypeError(msg)
 
-        _wrappers.set_id_copmponent_of_stamp(self._c_type, id_._c_type)
+        _wrappers.set_id_copmponent_of_stamp(self._c_type, id_._c_type)  # noqa: SLF001
 
     @property
-    def event_component(self) -> extended_api.Event:
-        """Get a copy of the Event component"""
+    def event_component(self: Self) -> extended_api.Event:
+        """Get a copy of the Event component."""
         return extended_api.Event(
             _c_type=_wrappers.get_event_component_of_stamp(self._c_type)
         )
 
     @event_component.setter
-    def event_component(self, event: extended_api.Event) -> None:
-        """Replace the Event component of the Stamp with a copy of the input Event"""
+    def event_component(self: Self, event: extended_api.Event) -> None:
+        """Replace the Event component of the Stamp with a copy of the input Event."""
         if not isinstance(event, extended_api.Event):
-            raise TypeError(f"Expected instance of Event, got event={type(event)}")
+            msg = f"Expected instance of Event, got event={type(event)}"
+            raise TypeError(msg)
 
-        _wrappers.set_event_copmponent_of_stamp(self._c_type, event._c_type)
+        _wrappers.set_event_copmponent_of_stamp(self._c_type, event._c_type)  # noqa: SLF001
 
-    def peek(self) -> "Stamp":
-        """Create a peek Stamp (Stamp with NULL ID) from the current Stamp
+    def peek(self: Self) -> Stamp:
+        """Create a peek Stamp (Stamp with NULL ID) from the current Stamp.
 
         :returns: The peek Stamp
         :rtype: Stamp
@@ -112,9 +131,11 @@ class Stamp(_wrappers.ItcWrapper):
         """
         return Stamp(_c_type=_wrappers.new_peek_stamp(self._c_type))
 
-    def fork(self) -> "Stamp":
-        """Fork (split) the Stamp into two distinct (non-overlapping) intervals
-        with the same causal history
+    def fork(self: Self) -> Stamp:
+        """Fork the Stamp into two intervals with the same causal history.
+
+        Fork (split) the Stamp into two distinct (non-overlapping) intervals
+        with the same causal history.
 
         After forking this Stamp owns the first half of the forked interval.
 
@@ -124,23 +145,24 @@ class Stamp(_wrappers.ItcWrapper):
         """
         return Stamp(_c_type=_wrappers.fork_stamp(self._c_type))
 
-    def event(self, count: int = 1) -> "Stamp":
-        """Add an event to the Stamp (inflate it)
+    def event(self: Self, count: int = 1) -> Self:
+        """Add an event to the Stamp (inflate it).
 
         :returns: self
         :rtype: Stamp
         :raises ItcError: If something goes wrong during the inflation
         """
         if count < 1:
-            raise ValueError("Count must be >= 1")
+            msg = "Count must be >= 1"
+            raise ValueError(msg)
 
         for _ in range(count):
             _wrappers.inflate_stamp(self._c_type)
 
         return self
 
-    def join(self, *other_stamp: "Stamp") -> "Stamp":
-        """Join Stamp interval(s)
+    def join(self: Self, *other_stamp: Stamp) -> Self:
+        """Join Stamp interval(s).
 
         After joining, this Stamp becomes the owner of the joined interval(s),
         while `other_stamp` becomes invalid and cannot be used anymore.
@@ -155,17 +177,19 @@ class Stamp(_wrappers.ItcWrapper):
         """
         for stamp in other_stamp:
             if not isinstance(stamp, Stamp):
-                raise TypeError(f"Expected instance of Stamp, got stamp={type(stamp)}")
-            if self._c_type == stamp._c_type:
-                raise ValueError("A Stamp cannot be joined with itself")
+                msg = f"Expected instance of Stamp, got stamp={type(stamp)}"
+                raise TypeError(msg)
+            if self._c_type == stamp._c_type:  # noqa: SLF001
+                msg = "A Stamp cannot be joined with itself"
+                raise ValueError(msg)
 
         for stamp in other_stamp:
-            _wrappers.join_stamp(self._c_type, stamp._c_type)
+            _wrappers.join_stamp(self._c_type, stamp._c_type)  # noqa: SLF001
 
         return self
 
-    def __str__(self) -> str:
-        """Serialise a Stamp to string"""
+    def __str__(self: Self) -> str:
+        """Serialise a Stamp to string."""
         try:
             return (
                 _wrappers.serialise_stamp_to_string(self._c_type)
@@ -175,7 +199,8 @@ class Stamp(_wrappers.ItcWrapper):
         except ItcError:
             return "???"
 
-    def __lt__(self, other: "Stamp") -> bool:
+    def __lt__(self: Self, other: object) -> bool:
+        """Check if the Stamp is less than or equal to another Stamp."""
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
@@ -184,7 +209,8 @@ class Stamp(_wrappers.ItcWrapper):
             == _wrappers.StampComparisonResult.LESS_THAN
         )
 
-    def __le__(self, other: "Stamp") -> bool:
+    def __le__(self: Self, other: object) -> bool:
+        """Check if the Stamp is less than another Stamp."""
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
@@ -196,7 +222,8 @@ class Stamp(_wrappers.ItcWrapper):
             )
         )
 
-    def __gt__(self, other: "Stamp") -> bool:
+    def __gt__(self: Self, other: object) -> bool:
+        """Check if the Stamp is greater than another Stamp."""
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
@@ -205,7 +232,8 @@ class Stamp(_wrappers.ItcWrapper):
             == _wrappers.StampComparisonResult.GREATER_THAN
         )
 
-    def __ge__(self, other: "Stamp") -> bool:
+    def __ge__(self: Self, other: object) -> bool:
+        """Check if the Stamp is greater than or equal to another Stamp."""
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
@@ -217,7 +245,8 @@ class Stamp(_wrappers.ItcWrapper):
             )
         )
 
-    def __eq__(self, other: "Stamp") -> bool:
+    def __eq__(self: Self, other: object) -> bool:
+        """Check if the Stamp is equal to another Stamp."""
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
@@ -226,7 +255,8 @@ class Stamp(_wrappers.ItcWrapper):
             == _wrappers.StampComparisonResult.EQUAL
         )
 
-    def __ne__(self, other: "Stamp") -> bool:
+    def __ne__(self: Self, other: object) -> bool:
+        """Check if the Stamp is not equal to another Stamp."""
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
@@ -239,31 +269,32 @@ class Stamp(_wrappers.ItcWrapper):
             )
         )
 
-    def _new_c_type(self) -> _CTypesData:
-        """Create a new ITC Stamp. Only used during initialisation"""
+    def _new_c_type(self: Self) -> _CTypesData:
+        """Create a new ITC Stamp. Only used during initialisation."""
         if self._id and self._event:
             return _wrappers.new_stamp_from_id_and_event(
-                self._id._c_type, self._event._c_type
+                self._id._c_type,  # noqa: SLF001
+                self._event._c_type,  # noqa: SLF001
             )
 
         if self._id:
-            return _wrappers.new_stamp_from_id(self._id._c_type)
+            return _wrappers.new_stamp_from_id(self._id._c_type)  # noqa: SLF001
 
         if self._event:
             id_ = _wrappers.new_id(seed=True)
-            stamp = _wrappers.new_stamp_from_id_and_event(id_, self._event._c_type)
+            stamp = _wrappers.new_stamp_from_id_and_event(id_, self._event._c_type)  # noqa: SLF001
             _wrappers.free_id(id_)
             return stamp
 
         return _wrappers.new_stamp()
 
-    def _del_c_type(self, c_type: _CTypesData) -> None:
-        """Delete the underlying CFFI cdata object"""
+    def _del_c_type(self: Self, c_type: _CTypesData) -> None:
+        """Delete the underlying CFFI cdata object."""
         _wrappers.free_stamp(c_type)
 
-    @_wrappers.ItcWrapper._c_type.getter
-    def _c_type(self) -> _CTypesData:
-        """Get the underlying CFFI cdata object"""
+    @_wrappers.ItcWrapper._c_type.getter  # type: ignore[attr-defined] # noqa: SLF001
+    def _c_type(self: Self) -> _CTypesData:
+        """Get the underlying CFFI cdata object."""
         if not _wrappers.is_handle_valid(super()._c_type):
-            raise InactiveStampError()
+            raise InactiveStampError
         return super()._c_type

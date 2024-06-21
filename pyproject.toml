@@ -9,6 +9,7 @@ requires-python = '>=3.7'
 dependencies = [
   "cffi>=1.15.1; python_version<'3.8'",
   "cffi>=1.16; python_version>='3.8'",
+  "typing-extensions; python_version<'3.11'",
 ]
 optional-dependencies.test = [
   "pytest",
@@ -19,26 +20,26 @@ optional-dependencies.qa = [
   "mypy",
 ]
 
-[tool.isort]
-profile = "black"
-known_first_party = ["pyitc"]
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["E501", "D211", "D203", "D213", "ISC001", "COM812"]
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+# Avoid trying to fix flake8-bugbear (`B`) violations.
+unfixable = ["B"]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
-[tool.flake8]
-copyright-check = true
-max-line-length = 80
-max-complexity = 12
-extend-select = [
-  "B950",
-  "DOC",
-  "C",
-]
-extend-ignore = [
-  "E203",
-  "E501",
-  "E701",
-  "ANN101",
-  "ANN102",
-]
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*" = ["S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
 
 [tool.meson-python.args]
 # setup = []
