@@ -27,7 +27,14 @@ with Path(".python-version").open("r") as f:
 def test(session: nox.Session) -> None:
     """Run the tests."""
     session.install(".[test]")
-    session.run("pytest", "--cov=pyitc", *session.posargs)
+    session.run("pytest", *session.posargs)
+
+
+@nox.session(python=SUPPORTED_PYTHON_VERSIONS, name="testCoverage")
+def test_coverage(session: nox.Session) -> None:
+    """Run the tests with coverage."""
+    session.install(".[test]")
+    session.run("coverage", "run", "-m", "pytest", "--cov=pyitc", *session.posargs)
 
 
 @nox.session(reuse_venv=True)

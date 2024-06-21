@@ -38,7 +38,7 @@ jobs:
       - name: Install Nox
         run: pip install nox
       - name: Run Tests
-        run: nox --error-on-missing-interpreters -s test -- --cov-report=xml:reports/coverage.xml --cov-append
+        run: nox --error-on-missing-interpreters -s testCoverage -- --cov-report=xml:reports/coverage.xml --cov-append
       - name: Publish Coverage Results
         uses: codecov/codecov-action@v4
         with:
