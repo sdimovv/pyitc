@@ -9,12 +9,10 @@ from types import MappingProxyType
 
 from pyitc.pyitc import Stamp
 
-from . import extended_api
 from ._internals import _lib
 
 __all__ = [
     "SUPPORTED_FEATURES",
-    "extended_api",
     "Stamp",
 ]
 
