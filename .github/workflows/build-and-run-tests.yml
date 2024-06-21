@@ -8,8 +8,8 @@ on:
     branches: [ main ]
 
 jobs:
-  unit-tests:
-    name: Unit tests
+  unit-test:
+    name: Run unit tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -28,12 +28,12 @@ jobs:
           # python-version-file does not seem to support multiple versions
           # definition
           python-version: |
-              3.7
-              3.8
-              3.9
-              3.10
-              3.11
-              3.12
+            3.7
+            3.8
+            3.9
+            3.10
+            3.11
+            3.12
           cache: pip
       - name: Install Nox
         run: pip install nox
@@ -48,3 +48,38 @@ jobs:
           flags: unittests
           name: pyitc
           token: ${{ secrets.CODECOV_TOKEN }}
+  qa-test:
+    name: Run QA tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ['ubuntu-latest']
+        compiler: ['gcc']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install compiler
+        uses: rlalik/setup-cpp-compiler@master
+        with:
+          compiler: ${{ matrix.compiler }}
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          # python-version-file does not seem to support multiple versions
+          # definition
+          python-version: |
+            3.7
+            3.8
+            3.9
+            3.10
+            3.11
+            3.12
+          cache: pip
+      - name: Install Nox
+        run: pip install nox
+      - name: Check formatting
+        run: nox --error-on-missing-interpreters -s format -- --check
+      - name: Check linting
+        run: nox --error-on-missing-interpreters -s lint
+      - name: Check types
+        run: nox --error-on-missing-interpreters -s typeCheck
