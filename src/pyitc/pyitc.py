@@ -14,7 +14,7 @@ from .exceptions import InactiveStampError, ItcError
 
 if version_info < (3, 11):
     from typing_extensions import Self
-else:
+else:  # pragma: no cover
     from typing import Self
 
 if TYPE_CHECKING:  # pragma: no cover

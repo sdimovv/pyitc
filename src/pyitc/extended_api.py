@@ -13,7 +13,7 @@ from .exceptions import InactiveEventError, InactiveIdError, ItcError
 
 if version_info < (3, 11):
     from typing_extensions import Self
-else:
+else:  # pragma: no cover
     from typing import Self
 
 if TYPE_CHECKING:  # pragma: no cover

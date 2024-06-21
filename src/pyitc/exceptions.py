@@ -10,7 +10,7 @@ from sys import version_info
 
 if version_info < (3, 11):
     from typing_extensions import Self
-else:
+else:  # pragma: no cover
     from typing import Self
 
 from ._internals import _lib
