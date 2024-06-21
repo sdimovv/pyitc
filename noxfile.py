@@ -27,13 +27,8 @@ with Path(".python-version").open("r") as f:
 def test(session: nox.Session) -> None:
     """Run the tests."""
     session.install(".[test]")
-    session.run("pytest", *session.posargs)
-
-
-@nox.session(python=SUPPORTED_PYTHON_VERSIONS, name="testCoverage")
-def test_coverage(session: nox.Session) -> None:
-    """Run the tests with coverage."""
-    session.install(".[test]")
+    # Run pytest from `coverage`, instead of the other way around as
+    # otherwise `coverage` is being loaded late which skews the coverage results
     session.run("coverage", "run", "-m", "pytest", "--cov=pyitc", *session.posargs)
 
 
