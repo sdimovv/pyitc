@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any
 from ._internals import wrappers as _wrappers
 from .exceptions import InactiveEventError, InactiveIdError, ItcError
 
-if version_info < (3, 11):
+if version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
 else:  # pragma: no cover
     from typing import Self

@@ -14,7 +14,7 @@ from pyitc.exceptions import ItcCApiError, ItcStatus, UnknownError
 
 from . import _ffi, _lib
 
-if version_info < (3, 11):
+if version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
 else:  # pragma: no cover
     from typing import Self

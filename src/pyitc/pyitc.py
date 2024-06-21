@@ -12,7 +12,7 @@ from . import extended_api
 from ._internals import wrappers as _wrappers
 from .exceptions import InactiveStampError, ItcError
 
-if version_info < (3, 11):
+if version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
 else:  # pragma: no cover
     from typing import Self
