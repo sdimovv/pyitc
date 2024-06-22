@@ -29,7 +29,7 @@ jobs:
           cache: pip
       - name: Install Nox
         run: pip install nox
-      - name: Run Tests
+      - name: Build sdist
         run: nox --error-on-missing-interpreters -s sdist
   build-wheels:
     name: Build wheels
