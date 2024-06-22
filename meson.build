@@ -18,12 +18,14 @@ if sys.OS() == 'Linux'
         '-DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
         '-DITC_CONFIG_ENABLE_SERIALISE_TO_STRING_API=1',
     ]
+endif
 if sys.OS() == 'Windows'
     libitc_c_args = [
         '/DITC_CONFIG_ENABLE_EXTENDED_API=1',
         '/DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
         '/DITC_CONFIG_ENABLE_SERIALISE_TO_STRING_API=1',
     ]
+endif
 
 pyitc_pyext_name = '_@0@'.format(meson.project_name())
 
@@ -59,6 +61,7 @@ if sys.OS() == 'Linux'
         output: '@0@.h'.format(pyitc_pyext_name),
         capture: true,
     )
+endif
 if sys.OS() == 'Windows'
     pyitc_pp = configure_file(
         command: [
@@ -71,6 +74,8 @@ if sys.OS() == 'Windows'
         output: '@0@.h'.format(pyitc_pyext_name),
         capture: true,
     )
+endif
+
 # Generate the pyext preprocessor definitions (from the underlying C lib header)
 # Used to turn the `ITC_*` preprocessor definitions into global consts in the
 # python module
@@ -87,6 +92,7 @@ if sys.OS() == 'Linux'
         output: '@0@_definitions.h'.format(pyitc_pyext_name),
         capture: true,
     )
+endif
 if sys.OS() == 'Windows'
     pyitc_defs_pp = configure_file(
         command: [
@@ -100,6 +106,7 @@ if sys.OS() == 'Windows'
         output: '@0@_definitions.h'.format(pyitc_pyext_name),
         capture: true,
     )
+endif
 
 # Generate the pyext implementation using CFFI
 pyitc_src = configure_file(
