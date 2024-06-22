@@ -12,14 +12,14 @@ project('pyitc', 'c',
     ]
 )
 
-if sys.OS() == 'Linux'
+if build_machine.system() == 'linux'
     libitc_c_args = [
         '-DITC_CONFIG_ENABLE_EXTENDED_API=1',
         '-DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
         '-DITC_CONFIG_ENABLE_SERIALISE_TO_STRING_API=1',
     ]
 endif
-if sys.OS() == 'Windows'
+if build_machine.system() == 'windows'
     libitc_c_args = [
         '/DITC_CONFIG_ENABLE_EXTENDED_API=1',
         '/DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
@@ -49,7 +49,7 @@ libitc_inc_dir = meson.current_source_dir() / 'vendor' / 'libitc' / 'libitc' / '
 libitc_header =  libitc_inc_dir / 'ITC.h'
 
 # Generate the pyext interface (i.e. preprocess the underlying C lib header)
-if sys.OS() == 'Linux'
+if build_machine.system() == 'linux'
     pyitc_pp = configure_file(
         command: [
             c_compiler,
@@ -62,7 +62,7 @@ if sys.OS() == 'Linux'
         capture: true,
     )
 endif
-if sys.OS() == 'Windows'
+if build_machine.system() == 'windows'
     pyitc_pp = configure_file(
         command: [
             c_compiler,
@@ -79,7 +79,7 @@ endif
 # Generate the pyext preprocessor definitions (from the underlying C lib header)
 # Used to turn the `ITC_*` preprocessor definitions into global consts in the
 # python module
-if sys.OS() == 'Linux'
+if build_machine.system() == 'linux'
     pyitc_defs_pp = configure_file(
         command: [
             c_compiler,
@@ -93,7 +93,7 @@ if sys.OS() == 'Linux'
         capture: true,
     )
 endif
-if sys.OS() == 'Windows'
+if build_machine.system() == 'windows'
     pyitc_defs_pp = configure_file(
         command: [
             c_compiler,
