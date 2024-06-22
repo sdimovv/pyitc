@@ -55,3 +55,17 @@ def type_check(session: nox.Session) -> None:
     else:
         posargs = session.posargs
     session.run("mypy", *posargs)
+
+
+@nox.session(python=SUPPORTED_PYTHON_VERSIONS)
+def wheel(session: nox.Session) -> None:
+    """Build a wheel."""
+    session.install("build")
+    session.run("python", "-m", "build", "-w")
+
+
+@nox.session
+def sdist(session: nox.Session) -> None:
+    """Build an sdist."""
+    session.install("build")
+    session.run("python", "-m", "build", "-s")
