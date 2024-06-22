@@ -22,7 +22,13 @@ module_name = sys.argv[3]
 ffibuilder = cffi.FFI()
 
 with Path(header_file).open("r") as f:
-    ffibuilder.cdef(f.read())
+    # On i686 linux systems 64-bit types are a GCC extension.
+    # Thus, to suppress warnings about extension usage, the GCC preproccessor
+    # will prepend an `__extension__` directive.
+    # This confuses pycparser and is not needed, so just remove it.
+    contents = f.read()
+    contents = re.sub(r"^__extension__.*\n", "", contents, flags=re.MULTILINE)
+    ffibuilder.cdef(contents)
 
 with Path(header_definitions_file).open("r") as f:
     contents = f.read()
