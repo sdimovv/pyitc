@@ -1,0 +1,47 @@
+---
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          # python-version-file does not seem to support multiple versions
+          # definition
+          python-version: |
+            3.7
+            3.8
+            3.9
+            3.10
+            3.11
+            3.12
+          cache: pip
+      - name: Install Nox
+        run: pip install nox
+      - name: Run Tests
+        run: nox --error-on-missing-interpreters -s sdist
+  build-wheels:
+    name: Build wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: ['ubuntu-latest', 'windows-latest', 'macos-13', 'macos-14']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.19.1
+        with:
+          output-dir: dist
