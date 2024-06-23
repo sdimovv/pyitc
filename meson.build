@@ -18,6 +18,16 @@ libitc_c_args = [
     '-DITC_CONFIG_ENABLE_SERIALISE_TO_STRING_API=1',
 ]
 
+# A set of defines to pass to the preprocessor when generating the pyitc C ext
+# code with CFFI. These are used to fool the preprocessor that certain system
+# headers have already been included and preprocessed (when in fact they haven't).
+#
+# The goal is to reduce the unrelevant noise present in the outputted headers
+# coming from the expansion of system includes in the source libitc headers.
+libitc_pyext_preproccessing_c_args = [
+    '-D_GCC_WRAP_STDINT_H',
+]
+
 pyitc_pyext_name = '_@0@'.format(meson.project_name())
 
 c_compiler = meson.get_compiler('c')
@@ -46,6 +56,7 @@ pyitc_pp = configure_file(
         '-I@0@'.format(libitc_inc_dir),
         libitc_c_args,
         '-E',
+        libitc_pyext_preproccessing_c_args,
         libitc_header,
     ],
     output: '@0@.h'.format(pyitc_pyext_name),
@@ -62,6 +73,7 @@ pyitc_defs_pp = configure_file(
         libitc_c_args,
         '-dM',
         '-E',
+        libitc_pyext_preproccessing_c_args,
         libitc_header,
     ],
     output: '@0@_definitions.h'.format(pyitc_pyext_name),
