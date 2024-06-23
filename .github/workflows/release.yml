@@ -46,40 +46,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      # - name: Build wheels
-      #   uses: pypa/cibuildwheel@v2.19.1
-      #   env:
-      #     # Building for 32-bit Windows is tricky because meson
-      #     # fails when installed on a 64-bit host but finds an x86 python install
-      #     #
-      #     # See: https://github.com/mesonbuild/meson/issues/13008#issuecomment-2033711252
-      #     #
-      #     # Because of this, 32-bit Windows users will need to build from source
-      #     # (using the sdist) but given that Windows 11 does not even offer
-      #     # 32-bit images, this is a pretty niche use case.
-      #     CIBW_ARCHS_WINDOWS: AMD64
-      #     # See: https://github.com/pypa/cibuildwheel/issues/1893
-      #     CIBW_SKIP: pp37-win*
-      #   with:
-      #     output-dir: dist
-      - name: Install Python
-        uses: actions/setup-python@v5
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.19.1
+        env:
+          # Building for 32-bit Windows is tricky because meson
+          # fails when installed on a 64-bit host but finds an x86 python install
+          #
+          # See: https://github.com/mesonbuild/meson/issues/13008#issuecomment-2033711252
+          #
+          # Because of this, 32-bit Windows users will need to build from source
+          # (using the sdist) but given that Windows 11 does not even offer
+          # 32-bit images, this is a pretty niche use case.
+          CIBW_ARCHS_WINDOWS: AMD64
+          # See: https://github.com/pypa/cibuildwheel/issues/1893
+          CIBW_SKIP: pp37-win*
         with:
-          # python-version-file does not seem to support multiple versions
-          # definition
-          python-version: |
-            3.7
-            3.8
-            3.9
-            3.10
-            3.11
-            3.12
-          cache: pip
-      - name: Cat stdint
-        run: cat /Applications/Xcode_15.0.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h
-      - name: Install modules
-        run: pip install ninja meson cffi setuptools
-      - run: meson setup test-build
-      - name: Print log
-        if: always()
-        run: cat /Users/runner/work/pyitc/pyitc/test-build/meson-logs/meson-log.txt
+          output-dir: dist
