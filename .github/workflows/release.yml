@@ -48,6 +48,18 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.19.1
         env:
+          # Build for all supported python versions
+          CIBW_BUILD: |
+            *37*
+            *38*
+            *39*
+            *310*
+            *311*
+            *312*
+          CIBW_BUILD_FRONTEND: build
+          CIBW_BUILD_VERBOSITY: 1
+          CIBW_TEST_COMMAND: pytest {project}
+          CIBW_TEST_REQUIRES: pytest
           # Building for 32-bit Windows is tricky because meson
           # fails when installed on a 64-bit host but finds an x86 python install
           #

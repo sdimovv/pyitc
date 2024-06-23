@@ -41,18 +41,6 @@ line-ending = "auto"
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
-[tool.cibuildwheel]
-build = "*"
-free-threaded-support = false
-
-build-frontend = "build"
-build-verbosity = 1
-
-test-command = "pytest {project}"
-test-requires = [
-  "pytest"
-]
-
 [tool.meson-python.args]
 # setup = []
 # compile = []
