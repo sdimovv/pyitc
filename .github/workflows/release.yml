@@ -56,8 +56,6 @@ jobs:
         run: pip install meson ninja build cffi
       - run: meson setup test-build
       - run: meson compile -vC test-build
-      - run: cat D:\a\pyitc\pyitc\test-build\meson-logs\meson-log.txt
-        if: always()
       - name: Test gcc 64
         run: x86_64-posix-seh-rev2 -v
       - name: Test gcc 32
