@@ -53,6 +53,6 @@ jobs:
           # (using the sdist) but given that Windows 11 does not even offer
           # 32-bit images, this is a pretty niche use case.
           CIBW_ARCHS_WINDOWS: AMD64
-          CIBW_SKIP: pp37-win*
+          # CIBW_SKIP: pp37-win*
         with:
           output-dir: dist
