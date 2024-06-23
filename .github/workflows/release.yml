@@ -34,7 +34,7 @@ jobs:
       - name: Upload Sdist As Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sdist
+          name: pyitc-sdist-pr-${{ github.event.number }}-${{ github.github_run_id }}-${{ github.github_run_attempt }}
           path: dist/*.tar.gz
           if-no-files-found: error
           retention-days: 30
@@ -91,7 +91,7 @@ jobs:
       - name: Upload Wheels As Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: pyitc-wheels-${{ matrix.os }}-pr-${{ github.event.number }}-${{ github.github_run_id }}-${{ github.github_run_attempt }}
           path: dist/*.whl
           if-no-files-found: error
           retention-days: 30
