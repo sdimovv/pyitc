@@ -31,6 +31,13 @@ jobs:
         run: pip install nox
       - name: Build sdist
         run: nox --error-on-missing-interpreters -s sdist
+      - name: Upload Sdist As Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 30
   build-wheels:
     name: Build wheels
     runs-on: ${{ matrix.os }}
@@ -81,3 +88,10 @@ jobs:
           CIBW_SKIP: pp37-win* pp310-macosx*
         with:
           output-dir: dist
+      - name: Upload Wheels As Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels
+          path: dist/*.whl
+          if-no-files-found: error
+          retention-days: 30
