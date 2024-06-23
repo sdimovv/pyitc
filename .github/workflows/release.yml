@@ -58,7 +58,7 @@ jobs:
           # (using the sdist) but given that Windows 11 does not even offer
           # 32-bit images, this is a pretty niche use case.
           CIBW_ARCHS_WINDOWS: AMD64
-          # See: https://github.com/pypa/cibuildwheel/issues/1893
-          CIBW_SKIP: pp37-win*
+          # pp37-win*: see https://github.com/pypa/cibuildwheel/issues/1893
+          CIBW_SKIP: pp37-win* pp310-macosx_x86_64
         with:
           output-dir: dist
