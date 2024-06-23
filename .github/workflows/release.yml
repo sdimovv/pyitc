@@ -37,14 +37,33 @@ jobs:
     strategy:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        os: ['ubuntu-latest', 'windows-latest', 'macos-13', 'macos-14']
+        os: [
+          # 'ubuntu-latest',
+          'windows-latest',
+          # 'macos-13',
+          # 'macos-14'
+          ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.19.1
-        env:
-          # CIBW_ARCHS_WINDOWS: AMD64
-          CIBW_SKIP: pp37-win*
+      - name: Install Python
+        uses: actions/setup-python@v5
         with:
-          output-dir: dist
+          python-version: |
+            3.12
+          cache: pip
+      - name: install modules
+        run: pip install meson ninja build cffi
+      - run: meson setup test-build
+      - run: meson compile -vC test-build
+      - name: Test gcc 64
+        run: x86_64-posix-seh-rev2 -v
+      - name: Test gcc 32
+        run: i686-posix-seh-rev2 -v
+      # - name: Build wheels
+      #   uses: pypa/cibuildwheel@v2.19.1
+      #   env:
+      #     # CIBW_ARCHS_WINDOWS: AMD64
+      #     CIBW_SKIP: pp37-win*
+      #   with:
+      #     output-dir: dist
