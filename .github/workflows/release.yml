@@ -75,6 +75,8 @@ jobs:
             3.11
             3.12
           cache: pip
+      - name: Cat stdint
+        run: cat /Applications/Xcode_15.0.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include/stdint.h
       - name: Install modules
         run: pip install ninja meson cffi setuptools
       - run: meson setup test-build
