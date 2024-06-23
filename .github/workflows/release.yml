@@ -45,5 +45,6 @@ jobs:
         uses: pypa/cibuildwheel@v2.19.1
         env:
           CIBW_ARCHS_WINDOWS: AMD64
+          CIBW_SKIP: pp37-win*
         with:
           output-dir: dist
