@@ -12,20 +12,11 @@ project('pyitc', 'c',
     ]
 )
 
-if build_machine.system() == 'linux'
-    libitc_c_args = [
-        '-DITC_CONFIG_ENABLE_EXTENDED_API=1',
-        '-DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
-        '-DITC_CONFIG_ENABLE_SERIALISE_TO_STRING_API=1',
-    ]
-endif
-if build_machine.system() == 'windows'
-    libitc_c_args = [
-        '/DITC_CONFIG_ENABLE_EXTENDED_API=1',
-        '/DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
-        '/DITC_CONFIG_ENABLE_SERIALISE_TO_STRING_API=1',
-    ]
-endif
+libitc_c_args = [
+    '-DITC_CONFIG_ENABLE_EXTENDED_API=1',
+    '-DITC_CONFIG_USE_64BIT_EVENT_COUNTERS=1',
+    '-DITC_CONFIG_ENABLE_SERIALISE_TO_STRING_API=1',
+]
 
 pyitc_pyext_name = '_@0@'.format(meson.project_name())
 
@@ -49,64 +40,33 @@ libitc_inc_dir = meson.current_source_dir() / 'vendor' / 'libitc' / 'libitc' / '
 libitc_header =  libitc_inc_dir / 'ITC.h'
 
 # Generate the pyext interface (i.e. preprocess the underlying C lib header)
-if build_machine.system() == 'linux'
-    pyitc_pp = configure_file(
-        command: [
-            c_compiler,
-            '-I@0@'.format(libitc_inc_dir),
-            libitc_c_args,
-            '-E',
-            libitc_header,
-        ],
-        output: '@0@.h'.format(pyitc_pyext_name),
-        capture: true,
-    )
-endif
-if build_machine.system() == 'windows'
-    pyitc_pp = configure_file(
-        command: [
-            c_compiler,
-            '/I@0@'.format(libitc_inc_dir),
-            libitc_c_args,
-            '/E',
-            libitc_header,
-        ],
-        output: '@0@.h'.format(pyitc_pyext_name),
-        capture: true,
-    )
-endif
+pyitc_pp = configure_file(
+    command: [
+        c_compiler,
+        '-I@0@'.format(libitc_inc_dir),
+        libitc_c_args,
+        '-E',
+        libitc_header,
+    ],
+    output: '@0@.h'.format(pyitc_pyext_name),
+    capture: true,
+)
 
 # Generate the pyext preprocessor definitions (from the underlying C lib header)
 # Used to turn the `ITC_*` preprocessor definitions into global consts in the
 # python module
-if build_machine.system() == 'linux'
-    pyitc_defs_pp = configure_file(
-        command: [
-            c_compiler,
-            '-I@0@'.format(libitc_inc_dir),
-            libitc_c_args,
-            '-dM',
-            '-E',
-            libitc_header,
-        ],
-        output: '@0@_definitions.h'.format(pyitc_pyext_name),
-        capture: true,
-    )
-endif
-if build_machine.system() == 'windows'
-    pyitc_defs_pp = configure_file(
-        command: [
-            c_compiler,
-            '/I@0@'.format(libitc_inc_dir),
-            libitc_c_args,
-            '/d1PP',
-            '/E',
-            libitc_header,
-        ],
-        output: '@0@_definitions.h'.format(pyitc_pyext_name),
-        capture: true,
-    )
-endif
+pyitc_defs_pp = configure_file(
+    command: [
+        c_compiler,
+        '-I@0@'.format(libitc_inc_dir),
+        libitc_c_args,
+        '-dM',
+        '-E',
+        libitc_header,
+    ],
+    output: '@0@_definitions.h'.format(pyitc_pyext_name),
+    capture: true,
+)
 
 # Generate the pyext implementation using CFFI
 pyitc_src = configure_file(
