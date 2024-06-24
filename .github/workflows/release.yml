@@ -1,0 +1,62 @@
+---
+name: Release
+
+on:
+  workflow_run:
+    workflows: [Build And Run Tests]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  check-conditions:
+    name: Check Conditions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check For Valid Release
+        id: check-for-valid-release
+        run: |
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+.*$ ]]; then
+            echo "is-release=true" >> $GITHUB_OUTPUT
+            if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "pre-release=false" >> $GITHUB_OUTPUT
+            else
+                echo "pre-release=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "is-release=false" >> $GITHUB_OUTPUT
+          fi
+    outputs:
+      is-valid-release: ${{ steps.check-for-valid-release.outputs.is-release == 'true' && github.event.workflow_run.conclusion == 'success' }}
+      is-pre-release: ${{ steps.check-for-valid-release.outputs.pre-release == 'true' }}
+  release:
+    runs-on: ubuntu-latest
+    needs:
+    - check-conditions
+    if: ${{needs.check-conditions.outputs.is-valid-release}}
+    permissions:
+      id-token: write # Needed to sign the wheels and sdist
+      contents: write # Needed to create the GH release
+    steps:
+      - name: Download Sdist And Wheels
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          # name: # Download all
+          path: dist/
+          workflow_conclusion: success
+          branch: main
+          if_no_artifact_found: fail
+          allow_forks: false
+      - name: Sign With Sigstore
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          append_body: true
+          prerelease: ${{needs.check-conditions.outputs.is-pre-release}}
+          files: dist/**
