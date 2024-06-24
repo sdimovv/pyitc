@@ -1,25 +1,19 @@
 ---
 name: Release
 
-# on:
-#   push:
-#     branches: [ main ]
-#     tags:
-#       - "v*.*.*"
-
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_run:
+    workflows: [Build And Run Tests]
+    types: [completed]
+    branches: [configure-releases] # TODO: Change to main
 
 jobs:
-  check-tag:
-    name: Check Tag
+  check-conditions:
+    name: Check Conditions
     runs-on: ubuntu-latest
     steps:
-      - name: Check For Release
-        id: check-for-release
+      - name: Check For Valid Release
+        id: check-for-valid-release
         run: |
           if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+.*$ ]]; then
             echo "is-release=true" >> $GITHUB_OUTPUT
@@ -32,8 +26,8 @@ jobs:
             echo "is-release=false" >> $GITHUB_OUTPUT
           fi
     outputs:
-      is-valid-release: ${{ steps.check-for-release.outputs.is-release == 'true' }}
-      is-pre-release: ${{ steps.check-for-release.outputs.pre-release == 'true' }}
+      is-valid-release: ${{ steps.check-for-valid-release.outputs.is-release == 'true' && github.event.workflow_run.conclusion == 'success' }}
+      is-pre-release: ${{ steps.check-for-valid-release.outputs.pre-release == 'true' }}
   release:
     runs-on: ubuntu-latest
     needs:
@@ -49,7 +43,7 @@ jobs:
           # name: # Download all
           path: dist/
           workflow_conclusion: success
-          branch: configure-releases
+          branch: configure-releases # TODO: Change to main
           if_no_artifact_found: fail
           allow_forks: false
       - name: Sign With Sigstore
