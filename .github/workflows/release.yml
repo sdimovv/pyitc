@@ -5,7 +5,8 @@ on:
   workflow_dispatch:
   workflow_run:
     workflows: ["Build And Run Tests"]
-    types: [completed]
+    # types: [completed]
+    # branches: [main]
 
 jobs:
   check-conditions:
