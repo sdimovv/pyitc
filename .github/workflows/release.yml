@@ -13,9 +13,6 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions:
-  contents: write
-
 jobs:
   check-release:
     name: Check Tag
@@ -136,6 +133,7 @@ jobs:
     - build-wheels
     permissions:
       id-token: write # Needed to sign the wheels and sdist
+      contents: write # Needed to create the GH release
     steps:
       - name: Download Sdist And Wheels
         uses: actions/download-artifact@v4
