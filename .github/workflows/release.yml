@@ -140,20 +140,18 @@ jobs:
     - build-sdist
     - build-wheels
     steps:
-      - name: Download all the dists
+      - name: Download Sdist And Wheels
         uses: actions/download-artifact@v4
         with:
           # name: # Download all
           path: dist/
           merge-multiple: true
-      - name: List dir
-        run: ls -l dist
-      # - name: Sign the dists with Sigstore
-      #   uses: sigstore/gh-action-sigstore-python@v2.1.1
-      #   with:
-      #     inputs: >-
-      #       ./dist/*.tar.gz
-      #       ./dist/*.whl
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
 
       # - name: Release
       #   if: ${{ steps.check-for-release.outputs.is-release == 'true' }}
