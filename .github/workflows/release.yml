@@ -149,12 +149,11 @@ jobs:
           inputs: >-
             ./dist/*.tar.gz
             ./dist/*.whl
-
-      # - name: Release
-      #   if: ${{ steps.check-for-release.outputs.is-release == 'true' }}
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     draft: true
-      #     generate_release_notes: true
-      #     append_body: true
-      #     prerelease: ${{ steps.check-for-release.outputs.pre-release == 'true' }}
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          append_body: true
+          prerelease: ${{ steps.check-for-release.outputs.pre-release == 'true' }}
+          files: dist/**
