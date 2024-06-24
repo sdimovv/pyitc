@@ -26,7 +26,7 @@ jobs:
             echo "is-release=false" >> $GITHUB_OUTPUT
           fi
     outputs:
-      is-valid-release: ${{ steps.check-for-valid-release.outputs.is-release == 'true' && github.event.workflow_run.conclusion == 'success' }}
+      is-valid-release: ${{ github.event.workflow_run.conclusion == 'success' }}
       is-pre-release: ${{ steps.check-for-valid-release.outputs.pre-release == 'true' }}
   release:
     runs-on: ubuntu-latest
