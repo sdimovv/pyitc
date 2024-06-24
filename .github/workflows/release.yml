@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   check-release:
-    name: Check release
+    name: Check Tag
     runs-on: ubuntu-latest
     steps:
       - name: Check For Release
