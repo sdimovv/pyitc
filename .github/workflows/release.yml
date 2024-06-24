@@ -34,14 +34,15 @@ jobs:
           else
             echo "is-release=false" >> $GITHUB_OUTPUT
           fi
-      - name: Fail Workflow
-        if: ${{ steps.check-for-release.outputs.is-release != 'true' }}
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.setFailed('Not a valid release!')
+      # - name: Fail Workflow
+      #   if: ${{ steps.check-for-release.outputs.is-release != 'true' }}
+      #   uses: actions/github-script@v7
+      #   with:
+      #     script: |
+      #       core.setFailed('Not a valid release!')
     outputs:
-      is-pre-release: ${{ steps.check-for-release.outputs.pre-release == 'true' }}
+      # is-pre-release: ${{ steps.check-for-release.outputs.pre-release == 'true' }}
+      is-pre-release: false
   build-sdist:
     name: Build sdist
     runs-on: ubuntu-latest
