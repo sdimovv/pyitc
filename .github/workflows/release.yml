@@ -5,7 +5,7 @@ on:
   workflow_run:
     workflows: [ Build And Run Tests ]
     types: [ completed ]
-    branches: [ main ]
+    branches: [ v*.*.* ]
 
 jobs:
   check-conditions:
