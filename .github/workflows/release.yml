@@ -3,9 +3,9 @@ name: Release
 
 on:
   workflow_run:
-    workflows: [Build And Run Tests]
-    types: [completed]
-    branches: [main]
+    workflows: [ Build And Run Tests ]
+    types: [ completed ]
+    branches: [ main ]
 
 jobs:
   check-conditions:
