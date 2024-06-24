@@ -134,29 +134,29 @@ jobs:
           path: dist/*.whl
           if-no-files-found: error
           retention-days: 1
-  # release:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Download all the dists
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         # name: # Download all
-  #         path: dist/
-  #         merge-multiple: true
-  #     - name: List dir
-  #       run: ls -l dist
-  #     # - name: Sign the dists with Sigstore
-  #     #   uses: sigstore/gh-action-sigstore-python@v2.1.1
-  #     #   with:
-  #     #     inputs: >-
-  #     #       ./dist/*.tar.gz
-  #     #       ./dist/*.whl
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          # name: # Download all
+          path: dist/
+          merge-multiple: true
+      - name: List dir
+        run: ls -l dist
+      # - name: Sign the dists with Sigstore
+      #   uses: sigstore/gh-action-sigstore-python@v2.1.1
+      #   with:
+      #     inputs: >-
+      #       ./dist/*.tar.gz
+      #       ./dist/*.whl
 
-  #     # - name: Release
-  #     #   if: ${{ steps.check-for-release.outputs.is-release == 'true' }}
-  #     #   uses: softprops/action-gh-release@v2
-  #     #   with:
-  #     #     draft: true
-  #     #     generate_release_notes: true
-  #     #     append_body: true
-  #     #     prerelease: ${{ steps.check-for-release.outputs.pre-release == 'true' }}
+      # - name: Release
+      #   if: ${{ steps.check-for-release.outputs.is-release == 'true' }}
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     draft: true
+      #     generate_release_notes: true
+      #     append_body: true
+      #     prerelease: ${{ steps.check-for-release.outputs.pre-release == 'true' }}
