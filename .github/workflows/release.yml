@@ -5,7 +5,7 @@ on:
   workflow_run:
     workflows: [Build And Run Tests]
     types: [completed]
-    branches: [configure-releases] # TODO: Change to main
+    branches: [main]
 
 jobs:
   check-conditions:
@@ -43,7 +43,7 @@ jobs:
           # name: # Download all
           path: dist/
           workflow_conclusion: success
-          branch: configure-releases # TODO: Change to main
+          branch: main
           if_no_artifact_found: fail
           allow_forks: false
       - name: Sign With Sigstore
