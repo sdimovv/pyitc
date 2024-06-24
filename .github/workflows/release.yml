@@ -137,12 +137,6 @@ jobs:
           # name: # Download all
           path: dist/
           merge-multiple: true
-      - name: Sign With Sigstore
-        uses: sigstore/gh-action-sigstore-python@v2.1.1
-        with:
-          inputs: >-
-            ./dist/*.tar.gz
-            ./dist/*.whl
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
