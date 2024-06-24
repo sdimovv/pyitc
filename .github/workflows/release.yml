@@ -2,11 +2,11 @@
 name: Release
 
 on:
-  workflow_dispatch:
   workflow_run:
-    workflows: [ Build And Run Tests ]
-    # types: [completed]
-    # branches: [main]
+    workflows:
+      - Build And Run Tests
+    types:
+      - completed
 
 jobs:
   check-conditions:
