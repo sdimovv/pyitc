@@ -4,7 +4,7 @@ name: Release
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Build And Run Tests"]
+    workflows: [ Build And Run Tests ]
     # types: [completed]
     # branches: [main]
 
