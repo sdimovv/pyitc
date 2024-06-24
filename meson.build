@@ -24,6 +24,7 @@ libitc_c_args = [
 #
 # The goal is to reduce the unrelevant noise present in the outputted headers
 # coming from the expansion of system includes in the source libitc headers.
+# Otherwise `pycparser` can get confused and fail.
 libitc_pyext_preproccessing_c_args = [
     '-D_GCC_WRAP_STDINT_H', # Define for stdint.h on mingw64
     '-D__CLANG_STDINT_H', # Define for stdint.h on Xcode clang-15
