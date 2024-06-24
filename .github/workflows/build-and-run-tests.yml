@@ -119,6 +119,9 @@ jobs:
     strategy:
       matrix:
         os: [
+          'ubuntu-latest',
+          'windows-latest',
+          'macos-13', # intel
           'macos-14', # apple silicon
         ]
     steps:
@@ -129,6 +132,11 @@ jobs:
         env:
           # Build for all supported python versions
           CIBW_BUILD: |
+            *37*
+            *38*
+            *39*
+            *310*
+            *311*
             *312*
           CIBW_BUILD_FRONTEND: build
           CIBW_BUILD_VERBOSITY: 1
