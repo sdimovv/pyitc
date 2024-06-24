@@ -83,3 +83,90 @@ jobs:
         run: nox --error-on-missing-interpreters -s lint
       - name: Check types
         run: nox --error-on-missing-interpreters -s typeCheck
+  build-sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          # python-version-file does not seem to support multiple versions
+          # definition
+          python-version: |
+            3.7
+            3.8
+            3.9
+            3.10
+            3.11
+            3.12
+          cache: pip
+      - name: Install Nox
+        run: pip install nox
+      - name: Build sdist
+        run: nox --error-on-missing-interpreters -s sdist
+      - name: Upload Sdist As Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyitc-sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+  build-wheels:
+    name: Build wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [
+          'ubuntu-latest',
+          'windows-latest',
+          'macos-13', # intel
+          'macos-14', # apple silicon
+        ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.19.1
+        env:
+          # Build for all supported python versions
+          CIBW_BUILD: |
+            *37*
+            *38*
+            *39*
+            *310*
+            *311*
+            *312*
+          CIBW_BUILD_FRONTEND: build
+          CIBW_BUILD_VERBOSITY: 1
+          CIBW_TEST_COMMAND: pytest {project}
+          CIBW_TEST_REQUIRES: pytest
+          # Building for 32-bit Windows is tricky because meson
+          # fails when installed on a 64-bit host but finds an x86 python install
+          #
+          # See: https://github.com/mesonbuild/meson/issues/13008#issuecomment-2033711252
+          #
+          # Because of this, 32-bit Windows users will need to build from source
+          # (using the sdist) but given that Windows 11 does not even offer
+          # 32-bit images, this is a pretty niche use case.
+          CIBW_ARCHS_WINDOWS: AMD64
+          # pp37-win*: see https://github.com/pypa/cibuildwheel/issues/1893
+          # pp310-macosx*: (TODO) For some reason it fails with:
+          # ```
+          # /Users/runner/Library/Caches/cibuildwheel/pypy3.10-v7.3.16-macos_arm64/include/pypy3.10/object.h:66:28: error: redefinition of typedef 'PyTypeObject' is a C11 feature [-Werror,-Wtypedef-redefinition]
+          #   typedef struct _typeobject PyTypeObject;
+          #   ^
+          # /Users/runner/Library/Caches/cibuildwheel/pypy3.10-v7.3.16-macos_arm64/include/pypy3.10/cpyext_object.h:293:3: note: previous definition is here
+          # } PyTypeObject;
+          # ```
+          CIBW_SKIP: pp37-win* pp310-macosx*
+        with:
+          output-dir: dist
+      - name: Upload Wheels As Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyitc-wheels-${{ matrix.os }}
+          path: dist/*.whl
+          if-no-files-found: error
+          retention-days: 14
