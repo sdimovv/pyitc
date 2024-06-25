@@ -103,6 +103,7 @@ python.extension_module(
     ],
     subdir: meson.project_name(),
     install: true,
+    limited_api: '3.7',
 )
 
 python.install_sources(

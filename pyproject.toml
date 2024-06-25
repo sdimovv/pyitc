@@ -41,6 +41,9 @@ line-ending = "auto"
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
+[tool.meson-python]
+limited-api = true
+
 [tool.meson-python.args]
 # setup = []
 # compile = []
