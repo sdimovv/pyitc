@@ -1,6 +1,8 @@
 # pyitc
 
-<img src="https://img.shields.io/github/actions/workflow/status/sdimovv/pyitc/.github%2Fworkflows%2Fbuild-and-run-tests.yml?branch=main&logo=github" alt="Build Status"> <a href="https://github.com/sdimovv/pyitc/releases/latest"><img src="https://img.shields.io/github/v/release/sdimovv/pyitc" alt="Latest GitHub Release"></a> <a href="./LICENSE"><img src="https://img.shields.io/github/license/sdimovv/pyitc" alt="License AGPL-3.0"></a>
+<img src="https://img.shields.io/github/actions/workflow/status/sdimovv/pyitc/.github%2Fworkflows%2Fbuild-and-run-tests.yml?branch=main&logo=github" alt="Build Status"> <a href="https://codecov.io/gh/sdimovv/pyitc" >
+ <img src="https://codecov.io/gh/sdimovv/pyitc/graph/badge.svg"/>
+ </a> <a href="https://github.com/sdimovv/pyitc/releases/latest"><img src="https://img.shields.io/github/v/release/sdimovv/pyitc" alt="Latest GitHub Release"></a> <a href="./LICENSE"><img src="https://img.shields.io/github/license/sdimovv/pyitc" alt="License AGPL-3.0"></a>
 
 Python bindings for the [libitc library](https://github.com/sdimovv/libitc).
 
