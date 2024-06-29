@@ -42,6 +42,9 @@ docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
 [tool.meson-python]
+# Tell meson-python the extension module contained in the Python package
+# targets the Python limited API.
+# This can be overridden by setting `python.allow_limited_api=false`
 limited-api = true
 
 [tool.meson-python.args]
