@@ -4,6 +4,6 @@
 try:
     from pyitc._pyitc import ffi as _ffi  # type: ignore[import-untyped] # noqa: F401
     from pyitc._pyitc import lib as _lib  # type: ignore[import-untyped] # noqa: F401
-except ImportError:  # pragma: no cover
+except ImportError as exc:  # pragma: no cover
     msg = "pyitc C extension import failed, cannot use C-API"
-    raise ImportError(msg) from None
+    raise ImportError(msg) from exc
