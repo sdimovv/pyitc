@@ -58,7 +58,7 @@ dist = ['--include-subprojects']
 [build-system]
 requires = [
   "meson-python>=0.16.0",
-  'meson>=1.5.0rc1',
+  'meson>=1.5.0rc2',
   'ninja',
   "cffi>=1.15.1; python_version<'3.8'",
   "cffi>=1.16; python_version>='3.8'",
