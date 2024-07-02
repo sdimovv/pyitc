@@ -69,6 +69,7 @@ dist = ['--include-subprojects']
 [build-system]
 requires = [
   "meson-python>=0.16.0",
+  # TODO: Update to target next RC/stable when it comes out
   "meson @ git+https://github.com/amcn/meson@python-gcc-win32-limited-api",
   'ninja',
   "cffi>=1.15.1; python_version<'3.8'",
