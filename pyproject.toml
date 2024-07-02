@@ -62,7 +62,7 @@ limited-api = true
 # CIBW will provide this option when appropriate to build ABI3 wheels
 # However, it can also be uncommeted here to always build ABI3 wheels.
 # setup = ["-Dpython.allow_limited_api=true"]
-compile = []
+# compile = []
 install = ['--skip-subprojects']
 dist = ['--include-subprojects']
 
