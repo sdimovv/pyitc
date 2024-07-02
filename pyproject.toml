@@ -59,8 +59,8 @@ docstring-code-line-length = "dynamic"
 limited-api = true
 
 [tool.meson-python.args]
-# CI buildwheel should be defining this according to when CFFI
-# actually compiles for ABI3
+# CIBW will provide this option when appropriate to build ABI3 wheels
+# However, it can also be uncommeted here to always build ABI3 wheels.
 # setup = ["-Dpython.allow_limited_api=true"]
 # compile = []
 install = ['--skip-subprojects']
