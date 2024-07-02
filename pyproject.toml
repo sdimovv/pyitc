@@ -51,7 +51,7 @@ limited-api = true
 # CI buildwheel should be defining this according to when CFFI
 # actually compiles for ABI3
 # setup = ["-Dpython.allow_limited_api=true"]
-# compile = []
+compile = ["-v"]
 install = ['--skip-subprojects']
 dist = ['--include-subprojects']
 
