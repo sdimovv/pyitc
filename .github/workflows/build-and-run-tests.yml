@@ -144,6 +144,9 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
           CIBW_TEST_COMMAND: pytest {project}
           CIBW_TEST_REQUIRES: pytest
+          # Default commands can be found at:
+          # https://cibuildwheel.pypa.io/en/stable/options/#repair-wheel-command
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: auditwheel repair -w {dest_dir} {wheel} && pip install abi3audit && abi3audit --strict --report {wheel}
           # Building for 32-bit Windows is tricky because meson
           # fails when installed on a 64-bit host but finds an x86 python install
           #
