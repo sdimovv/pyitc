@@ -120,7 +120,7 @@ jobs:
       matrix:
         os: [
           'ubuntu-latest',
-          # 'windows-latest',
+          'windows-latest',
           'macos-13', # intel
           'macos-14', # apple silicon
         ]
