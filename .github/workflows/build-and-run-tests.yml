@@ -119,10 +119,10 @@ jobs:
     strategy:
       matrix:
         os: [
-          'ubuntu-latest',
+          # 'ubuntu-latest',
           'windows-latest',
-          'macos-13', # intel
-          'macos-14', # apple silicon
+          # 'macos-13', # intel
+          # 'macos-14', # apple silicon
         ]
     steps:
       - name: Checkout

@@ -62,14 +62,14 @@ limited-api = true
 # CIBW will provide this option when appropriate to build ABI3 wheels
 # However, it can also be uncommeted here to always build ABI3 wheels.
 # setup = ["-Dpython.allow_limited_api=true"]
-# compile = []
+compile = ["-v"]
 install = ['--skip-subprojects']
 dist = ['--include-subprojects']
 
 [build-system]
 requires = [
   "meson-python>=0.16.0",
-  'meson>=1.5.0rc2',
+  "meson @ git+https://github.com/amcn/meson@python-gcc-win32-limited-api",
   'ninja',
   "cffi>=1.15.1; python_version<'3.8'",
   "cffi>=1.16; python_version>='3.8'",
