@@ -41,7 +41,6 @@ jobs:
           # python-version-file does not seem to support multiple versions
           # definition
           python-version: |
-            3.7
             3.8
             3.9
             3.10

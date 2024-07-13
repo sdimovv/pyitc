@@ -16,10 +16,9 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3",
 ]
-requires-python = '>=3.7'
+requires-python = '>=3.8'
 dependencies = [
-  "cffi>=1.15.1; python_version<'3.8'",
-  "cffi>=1.16; python_version>='3.8'",
+  "cffi>=1.16",
   "typing-extensions; python_version<'3.11'",
 ]
 optional-dependencies.test = [
@@ -63,8 +62,7 @@ requires = [
   "meson-python>=0.16.0",
   'meson>=1.4.0',
   'ninja',
-  "cffi>=1.15.1; python_version<'3.8'",
-  "cffi>=1.16; python_version>='3.8'",
+  "cffi>=1.16",
   "setuptools; python_version>='3.12'",
 ]
 build-backend = 'mesonpy'
