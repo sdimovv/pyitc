@@ -112,8 +112,8 @@ python.extension_module(
     # whether it should be respected or ignored via the `python.allow_limited_api`
     # option.
     #
-    # CFFI docs state 3.5+, but this module targets 3.7+.
-    limited_api: '3.7',
+    # CFFI docs state 3.5+, but this module targets 3.8+.
+    limited_api: '3.8',
 )
 
 python.install_sources(

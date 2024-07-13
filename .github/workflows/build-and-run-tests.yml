@@ -28,7 +28,6 @@ jobs:
           # python-version-file does not seem to support multiple versions
           # definition
           python-version: |
-            3.7
             3.8
             3.9
             3.10
@@ -68,7 +67,6 @@ jobs:
           # python-version-file does not seem to support multiple versions
           # definition
           python-version: |
-            3.7
             3.8
             3.9
             3.10
@@ -95,7 +93,6 @@ jobs:
           # python-version-file does not seem to support multiple versions
           # definition
           python-version: |
-            3.7
             3.8
             3.9
             3.10
@@ -132,7 +129,6 @@ jobs:
         env:
           # Build for all supported python versions
           CIBW_BUILD: |
-            *cp37*
             *cp38*
             *cp39*
             *cp310*
@@ -163,7 +159,6 @@ jobs:
         env:
           # Build for all supported python versions
           CIBW_BUILD: |
-            *pp37*
             *pp38*
             *pp39*
             *pp310*
@@ -180,7 +175,6 @@ jobs:
           # (using the sdist) but given that Windows 11 does not even offer
           # 32-bit images, this is a pretty niche use case.
           CIBW_ARCHS_WINDOWS: AMD64
-          # pp37-win*: see https://github.com/pypa/cibuildwheel/issues/1893
           # pp310-macosx*: (TODO) For some reason it fails with:
           # ```
           # /Users/runner/Library/Caches/cibuildwheel/pypy3.10-v7.3.16-macos_arm64/include/pypy3.10/object.h:66:28: error: redefinition of typedef 'PyTypeObject' is a C11 feature [-Werror,-Wtypedef-redefinition]
@@ -189,7 +183,7 @@ jobs:
           # /Users/runner/Library/Caches/cibuildwheel/pypy3.10-v7.3.16-macos_arm64/include/pypy3.10/cpyext_object.h:293:3: note: previous definition is here
           # } PyTypeObject;
           # ```
-          CIBW_SKIP: pp37-win* pp310-macosx*
+          CIBW_SKIP: pp310-macosx*
         with:
           output-dir: dist
       - name: Upload Wheels As Artifacts
