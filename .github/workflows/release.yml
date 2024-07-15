@@ -95,8 +95,7 @@ jobs:
           # https://cibuildwheel.pypa.io/en/stable/options/#repair-wheel-command
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel} && pip install abi3audit && abi3audit --strict --report {wheel}
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: auditwheel repair -w {dest_dir} {wheel} && pip install abi3audit && abi3audit --strict --report {wheel}
-          # TODO: https://github.com/trailofbits/abi3audit/issues/97
-          # CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: pip install abi3audit && abi3audit --strict --report {wheel}
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: pip install abi3audit && abi3audit --strict --report {wheel} && copy {wheel} {dest_dir}
           # Building for 32-bit Windows is tricky because meson
           # fails when installed on a 64-bit host but finds an x86 python install
           #
