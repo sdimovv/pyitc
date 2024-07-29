@@ -36,7 +36,7 @@ print(stamp) # {(0, 1); 1}
 print(stamp.peek()) # {0, 1}
 print(stamp2) # {(1, 0); 1}
 
-if stamp == stamp2:
+if stamp == stamp2: # all comparision operators are supported
     print("yay!")
 else:
     print("nay")
