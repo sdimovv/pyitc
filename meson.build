@@ -7,8 +7,10 @@ project('pyitc', 'c',
     default_options : [
         'prefix=' + meson.current_build_dir(),
         'c_std=c99',
-        'python.allow_limited_api=false',
         'werror=true',
+        # Do not respect the `limited_api` arg of the
+        # `extension_module` call by default
+        'python.allow_limited_api=false',
     ]
 )
 
@@ -103,6 +105,15 @@ python.extension_module(
     ],
     subdir: meson.project_name(),
     install: true,
+    # CFFI uses the limited API when possible.
+    # The exact rules for when this happens are a little muddy and depend
+    # on both python and C preprocessor logic.
+    # Define what the minimum supported limited API version is here, but toggle
+    # whether it should be respected or ignored via the `python.allow_limited_api`
+    # option.
+    #
+    # CFFI docs state 3.5+, but this module targets 3.8+.
+    limited_api: '3.8',
 )
 
 python.install_sources(

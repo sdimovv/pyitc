@@ -51,8 +51,16 @@ line-ending = "auto"
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
+[tool.meson-python]
+# Tell meson-python the extension module contained in the Python package
+# targets the Python limited API.
+# This can be overridden by setting `python.allow_limited_api=false`
+limited-api = true
+
 [tool.meson-python.args]
-# setup = []
+# CIBW will provide this option when appropriate to build ABI3 wheels
+# However, it can also be uncommeted here to always build ABI3 wheels.
+# setup = ["-Dpython.allow_limited_api=true"]
 # compile = []
 install = ['--skip-subprojects']
 dist = ['--include-subprojects']
@@ -60,7 +68,7 @@ dist = ['--include-subprojects']
 [build-system]
 requires = [
   "meson-python>=0.16.0",
-  'meson>=1.4.0',
+  "meson>=1.5.0",
   'ninja',
   "cffi>=1.16",
   "setuptools; python_version>='3.12'",
