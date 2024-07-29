@@ -14,12 +14,12 @@ highly dynamic number of replicas/processes in a distributed system.
 
 ## Features
 
-* Provides easy-to-use Pythonesque bindings for the underlying C library
-* Provides `str` methods for easy visualisation of the ITC trees
-* Provides bindings the C lib's ["extended api"](https://github.com/sdimovv/libitc?tab=readme-ov-file#features:~:text=%22extended%22%20API%20interface)
+* Provides easy-to-use, Pythonesque bindings for the underlying C library
+* Provides `__str__` methods for easy visualisation of the ITC trees
+* Provides bindings for the C lib's ["extended API"](https://github.com/sdimovv/libitc?tab=readme-ov-file#features:~:text=%22extended%22%20API%20interface)
 * Uses 64-bit event counters
 
-## How to use
+## Usage examples
 
 Here are some usage examples:
 
@@ -35,6 +35,11 @@ stamp2 = stamp.fork()
 print(stamp) # {(0, 1); 1}
 print(stamp.peek()) # {0, 1}
 print(stamp2) # {(1, 0); 1}
+
+if stamp == stamp2:
+    print("yay!")
+else:
+    print("nay")
 
 print(stamp.id_component) # (0, 1)
 print(stamp.event_component) # 1
