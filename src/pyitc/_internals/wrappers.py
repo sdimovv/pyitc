@@ -6,11 +6,11 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from enum import IntEnum
 from sys import version_info
 from typing import TYPE_CHECKING, Any, Callable
 
 from pyitc.exceptions import ItcCApiError, ItcStatus, UnknownError
+from pyitc.util import StampComparisonResult
 
 from . import _ffi, _lib
 
@@ -21,15 +21,6 @@ else:  # pragma: no cover
 
 if TYPE_CHECKING:  # pragma: no cover
     from cffi.backend_ctypes import CTypesData  # type: ignore[import-untyped]
-
-
-class StampComparisonResult(IntEnum):
-    """The ITC Stamp comparison result returned from the C API."""
-
-    LESS_THAN = _lib.ITC_STAMP_COMPARISON_LESS_THAN
-    GREATER_THAN = _lib.ITC_STAMP_COMPARISON_GREATER_THAN
-    EQUAL = _lib.ITC_STAMP_COMPARISON_EQUAL
-    CONCURRENT = _lib.ITC_STAMP_COMPARISON_CONCURRENT
 
 
 class ItcWrapper(ABC):
