@@ -4,6 +4,7 @@
 """Tests for the Stamp class."""
 
 import pytest
+
 from pyitc import Stamp
 from pyitc.exceptions import InactiveStampError, ItcStatus, OverlappingIdIntervalError
 from pyitc.extended_api import Event, Id

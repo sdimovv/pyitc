@@ -4,6 +4,7 @@
 """Tests for the extended API."""
 
 import pytest
+
 from pyitc.exceptions import InactiveIdError, ItcStatus, OverlappingIdIntervalError
 from pyitc.extended_api import Event, Id
 

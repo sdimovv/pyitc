@@ -8,6 +8,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 import pytest
+
 from pyitc import Stamp
 from pyitc.extended_api import Event, Id
 
