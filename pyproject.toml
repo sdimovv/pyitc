@@ -21,14 +21,6 @@ dependencies = [
   "cffi>=1.16",
   "typing-extensions; python_version<'3.11'",
 ]
-optional-dependencies.test = [
-  "pytest",
-  "pytest-cov",
-]
-optional-dependencies.qa = [
-  "ruff",
-  "mypy",
-]
 
 [tool.ruff.lint]
 select = ["ALL"]

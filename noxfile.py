@@ -26,7 +26,7 @@ with Path(".python-version").open("r") as f:
 @nox.session(python=SUPPORTED_PYTHON_VERSIONS)
 def test(session: nox.Session) -> None:
     """Run the tests."""
-    session.install(".[test]")
+    session.install(".", "pytest", "pytest-cov")
     # Run pytest from `coverage`, instead of the other way around as
     # otherwise `coverage` is being loaded late which skews the coverage results
     session.run("coverage", "run", "-m", "pytest", "--cov=pyitc", *session.posargs)
@@ -35,21 +35,21 @@ def test(session: nox.Session) -> None:
 @nox.session(reuse_venv=True)
 def format(session: nox.Session) -> None:  # noqa: A001
     """Format the code."""
-    session.install(".[qa]")
+    session.install("ruff")
     session.run("ruff", "format", *session.posargs)
 
 
 @nox.session(reuse_venv=True)
 def lint(session: nox.Session) -> None:
     """Lint the code."""
-    session.install(".[qa]")
+    session.install("ruff")
     session.run("ruff", "check", *session.posargs)
 
 
 @nox.session(reuse_venv=True, name="typeCheck")
 def type_check(session: nox.Session) -> None:
     """Type check the code with mypy."""
-    session.install(".[test, qa]")
+    session.install(".", "pytest", "pytest-cov", "mypy")
     if not session.posargs:
         posargs = [Path(os.path.realpath(__file__)).parent]
     else:
