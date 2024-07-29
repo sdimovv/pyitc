@@ -8,12 +8,14 @@ from __future__ import annotations
 from types import MappingProxyType
 
 from pyitc.pyitc import Stamp
+from pyitc.util import StampComparisonResult
 
 from ._internals import _lib
 
 __all__ = [
     "SUPPORTED_FEATURES",
     "Stamp",
+    "StampComparisonResult",
 ]
 
 SUPPORTED_FEATURES: MappingProxyType[str, bool] = MappingProxyType(
