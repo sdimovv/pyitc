@@ -5,15 +5,13 @@
 
 from __future__ import annotations
 
-from enum import IntEnum
 from sys import version_info
 from typing import TYPE_CHECKING, Any
-
-from ._internals import _lib
 
 from . import extended_api
 from ._internals import wrappers as _wrappers
 from .exceptions import InactiveStampError, ItcError
+from .util import StampComparisonResult
 
 if version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
@@ -24,15 +22,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from cffi.backend_ctypes import (  # type: ignore[import-untyped]
         CTypesData as _CTypesData,
     )
-
-
-class StampComparisonResult(IntEnum):
-    """The ITC Stamp comparison result returned from the C API."""
-
-    LESS_THAN = _lib.ITC_STAMP_COMPARISON_LESS_THAN
-    GREATER_THAN = _lib.ITC_STAMP_COMPARISON_GREATER_THAN
-    EQUAL = _lib.ITC_STAMP_COMPARISON_EQUAL
-    CONCURRENT = _lib.ITC_STAMP_COMPARISON_CONCURRENT
 
 
 class Stamp(_wrappers.ItcWrapper):

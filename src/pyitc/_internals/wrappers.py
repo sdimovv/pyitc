@@ -10,7 +10,7 @@ from sys import version_info
 from typing import TYPE_CHECKING, Any, Callable
 
 from pyitc.exceptions import ItcCApiError, ItcStatus, UnknownError
-from pyitc import StampComparisonResult
+from pyitc.util import StampComparisonResult
 
 from . import _ffi, _lib
 

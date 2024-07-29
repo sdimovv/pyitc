@@ -7,7 +7,8 @@ from __future__ import annotations
 
 from types import MappingProxyType
 
-from pyitc.pyitc import Stamp, StampComparisonResult
+from pyitc.pyitc import Stamp
+from pyitc.util import StampComparisonResult
 
 from ._internals import _lib
 
