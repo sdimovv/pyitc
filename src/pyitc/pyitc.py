@@ -188,6 +188,17 @@ class Stamp(_wrappers.ItcWrapper):
 
         return self
 
+    def compare_to(self: Self, other_stamp: Stamp) -> _wrappers.StampComparisonResult:
+        """Compare the Stamp with another Stamp
+
+        :param other_stamp: The Stamp to compare with
+        :type other_stamp: Stamp
+        :returns: The result of the comparison
+        :rtype: StampComparisonResult
+        :raises ItcError: If something goes wrong during the comparison
+        """
+        return _wrappers.compare_stamps(self._c_type, other_stamp._c_type)
+
     def __str__(self: Self) -> str:
         """Serialise a Stamp to string."""
         try:
@@ -205,8 +216,7 @@ class Stamp(_wrappers.ItcWrapper):
             return NotImplemented
 
         return (
-            _wrappers.compare_stamps(self._c_type, other._c_type)
-            == _wrappers.StampComparisonResult.LESS_THAN
+            self.compare_to(other) == _wrappers.StampComparisonResult.LESS_THAN
         )
 
     def __le__(self: Self, other: object) -> bool:
@@ -215,7 +225,7 @@ class Stamp(_wrappers.ItcWrapper):
             return NotImplemented
 
         return bool(
-            _wrappers.compare_stamps(self._c_type, other._c_type)
+            self.compare_to(other)
             & (
                 _wrappers.StampComparisonResult.LESS_THAN
                 | _wrappers.StampComparisonResult.EQUAL
@@ -228,7 +238,7 @@ class Stamp(_wrappers.ItcWrapper):
             return NotImplemented
 
         return (
-            _wrappers.compare_stamps(self._c_type, other._c_type)
+            self.compare_to(other)
             == _wrappers.StampComparisonResult.GREATER_THAN
         )
 
@@ -238,7 +248,7 @@ class Stamp(_wrappers.ItcWrapper):
             return NotImplemented
 
         return bool(
-            _wrappers.compare_stamps(self._c_type, other._c_type)
+            self.compare_to(other)
             & (
                 _wrappers.StampComparisonResult.GREATER_THAN
                 | _wrappers.StampComparisonResult.EQUAL
@@ -251,7 +261,7 @@ class Stamp(_wrappers.ItcWrapper):
             return NotImplemented
 
         return (
-            _wrappers.compare_stamps(self._c_type, other._c_type)
+            self.compare_to(other)
             == _wrappers.StampComparisonResult.EQUAL
         )
 
@@ -261,7 +271,7 @@ class Stamp(_wrappers.ItcWrapper):
             return NotImplemented
 
         return bool(
-            _wrappers.compare_stamps(self._c_type, other._c_type)
+            self.compare_to(other)
             & (
                 _wrappers.StampComparisonResult.CONCURRENT
                 | _wrappers.StampComparisonResult.LESS_THAN
