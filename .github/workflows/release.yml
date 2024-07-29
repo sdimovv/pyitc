@@ -3,9 +3,7 @@ name: Release
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags: [ "v*.*.*" ]
 
 jobs:
   check-conditions:
@@ -26,8 +24,8 @@ jobs:
             echo "is-release=false" >> $GITHUB_OUTPUT
           fi
     outputs:
-      is-valid-release: ${{ 'true' == 'true' }}
-      is-pre-release: ${{ 'false' == 'true' }}
+      is-valid-release: ${{ steps.check-for-valid-release.outputs.is-release == 'true' }}
+      is-pre-release: ${{ steps.check-for-valid-release.outputs.pre-release == 'true' }}
   build-sdist:
     name: Build sdist
     runs-on: ubuntu-latest
@@ -175,7 +173,7 @@ jobs:
           generate_release_notes: true
           append_body: true
           prerelease: ${{needs.check-conditions.outputs.is-pre-release == 'true' }}
-      # - name: PyPI Release
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     repository-url: https://test.pypi.org/legacy/
+      - name: PyPI Release
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
