@@ -122,6 +122,7 @@ python.install_sources(
         'src' / 'pyitc' / 'extended_api.py',
         'src' / 'pyitc' / 'pyitc.py',
         'src' / 'pyitc' / 'exceptions.py',
+        'src' / 'pyitc' / 'util.py',
     ]),
     subdir: meson.project_name(),
 )
