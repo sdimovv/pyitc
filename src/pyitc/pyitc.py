@@ -236,10 +236,7 @@ class Stamp(_wrappers.ItcWrapper):
 
         return bool(
             self.compare_to(other)
-            & (
-                StampComparisonResult.LESS_THAN
-                | StampComparisonResult.EQUAL
-            )
+            & (StampComparisonResult.LESS_THAN | StampComparisonResult.EQUAL)
         )
 
     def __gt__(self: Self, other: object) -> bool:
@@ -256,10 +253,7 @@ class Stamp(_wrappers.ItcWrapper):
 
         return bool(
             self.compare_to(other)
-            & (
-                StampComparisonResult.GREATER_THAN
-                | StampComparisonResult.EQUAL
-            )
+            & (StampComparisonResult.GREATER_THAN | StampComparisonResult.EQUAL)
         )
 
     def __eq__(self: Self, other: object) -> bool:
