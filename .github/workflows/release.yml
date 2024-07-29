@@ -165,14 +165,15 @@ jobs:
           # name: # Download all
           path: dist/
           merge-multiple: true
-      - name: PyPI Release
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
       - name: GH Release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
+          files: dist/
           generate_release_notes: true
           append_body: true
           prerelease: ${{needs.check-conditions.outputs.is-pre-release == 'true' }}
+      - name: PyPI Release
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
