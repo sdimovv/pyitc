@@ -24,7 +24,7 @@ highly dynamic number of replicas/processes in a distributed system.
 Here are some usage examples:
 
 ```py
-from pyitc import Stamp
+from pyitc import Stamp, StampComparisonResult
 from pyitc.extended_api import Id, Event
 
 stamp = Stamp()
@@ -40,6 +40,9 @@ if stamp == stamp2:
     print("yay!")
 else:
     print("nay")
+
+if stamp.compare_to(stamp2) == StampComparisonResult.EQUAL: # equivalent to stamp == stamp2
+    print("yay again!")
 
 print(stamp.id_component) # (0, 1)
 print(stamp.event_component) # 1
