@@ -5,8 +5,11 @@
 
 from __future__ import annotations
 
+from enum import IntEnum
 from sys import version_info
 from typing import TYPE_CHECKING, Any
+
+from ._internals import _lib
 
 from . import extended_api
 from ._internals import wrappers as _wrappers
@@ -21,6 +24,15 @@ if TYPE_CHECKING:  # pragma: no cover
     from cffi.backend_ctypes import (  # type: ignore[import-untyped]
         CTypesData as _CTypesData,
     )
+
+
+class StampComparisonResult(IntEnum):
+    """The ITC Stamp comparison result returned from the C API."""
+
+    LESS_THAN = _lib.ITC_STAMP_COMPARISON_LESS_THAN
+    GREATER_THAN = _lib.ITC_STAMP_COMPARISON_GREATER_THAN
+    EQUAL = _lib.ITC_STAMP_COMPARISON_EQUAL
+    CONCURRENT = _lib.ITC_STAMP_COMPARISON_CONCURRENT
 
 
 class Stamp(_wrappers.ItcWrapper):
@@ -188,7 +200,7 @@ class Stamp(_wrappers.ItcWrapper):
 
         return self
 
-    def compare_to(self: Self, other_stamp: Stamp) -> _wrappers.StampComparisonResult:
+    def compare_to(self: Self, other_stamp: Stamp) -> StampComparisonResult:
         """Compare the Stamp to another Stamp.
 
         :param other_stamp: The Stamp to compare with
@@ -215,7 +227,7 @@ class Stamp(_wrappers.ItcWrapper):
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
-        return self.compare_to(other) == _wrappers.StampComparisonResult.LESS_THAN
+        return self.compare_to(other) == StampComparisonResult.LESS_THAN
 
     def __le__(self: Self, other: object) -> bool:
         """Check if the Stamp is less than another Stamp."""
@@ -225,8 +237,8 @@ class Stamp(_wrappers.ItcWrapper):
         return bool(
             self.compare_to(other)
             & (
-                _wrappers.StampComparisonResult.LESS_THAN
-                | _wrappers.StampComparisonResult.EQUAL
+                StampComparisonResult.LESS_THAN
+                | StampComparisonResult.EQUAL
             )
         )
 
@@ -235,7 +247,7 @@ class Stamp(_wrappers.ItcWrapper):
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
-        return self.compare_to(other) == _wrappers.StampComparisonResult.GREATER_THAN
+        return self.compare_to(other) == StampComparisonResult.GREATER_THAN
 
     def __ge__(self: Self, other: object) -> bool:
         """Check if the Stamp is greater than or equal to another Stamp."""
@@ -245,8 +257,8 @@ class Stamp(_wrappers.ItcWrapper):
         return bool(
             self.compare_to(other)
             & (
-                _wrappers.StampComparisonResult.GREATER_THAN
-                | _wrappers.StampComparisonResult.EQUAL
+                StampComparisonResult.GREATER_THAN
+                | StampComparisonResult.EQUAL
             )
         )
 
@@ -255,7 +267,7 @@ class Stamp(_wrappers.ItcWrapper):
         if not isinstance(other, Stamp):  # pragma: no cover
             return NotImplemented
 
-        return self.compare_to(other) == _wrappers.StampComparisonResult.EQUAL
+        return self.compare_to(other) == StampComparisonResult.EQUAL
 
     def __ne__(self: Self, other: object) -> bool:
         """Check if the Stamp is not equal to another Stamp."""
@@ -265,9 +277,9 @@ class Stamp(_wrappers.ItcWrapper):
         return bool(
             self.compare_to(other)
             & (
-                _wrappers.StampComparisonResult.CONCURRENT
-                | _wrappers.StampComparisonResult.LESS_THAN
-                | _wrappers.StampComparisonResult.GREATER_THAN
+                StampComparisonResult.CONCURRENT
+                | StampComparisonResult.LESS_THAN
+                | StampComparisonResult.GREATER_THAN
             )
         )
 
