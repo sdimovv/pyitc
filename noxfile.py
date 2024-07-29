@@ -44,6 +44,7 @@ def lint(session: nox.Session) -> None:
     """Lint the code."""
     session.install("ruff")
     session.run("python", "--version")
+    session.run("ruff", "--version")
     session.run("ruff", "check", *session.posargs)
 
 
